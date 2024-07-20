@@ -60,6 +60,12 @@
     <None Include="res\SPTablet32.rc2">
       <Filter>资源文件</Filter>
     </None>
+    <None Include="SPTablet.asm">
+      <Filter>源文件</Filter>
+    </None>
+    <None Include="SPTablet32.asm">
+      <Filter>源文件</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\SPTablet32.ico">

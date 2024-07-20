@@ -9,7 +9,7 @@ static void do_handshake(unsigned short port);
 static void set_baudrate(unsigned short port, unsigned char val, unsigned short baud_factor);
 static unsigned char read_mcr(unsigned short port);
 static unsigned char read_lsr(unsigned short port);
-static unsigned char read_data_wrapper(unsigned short port);
+static unsigned char read_data_wrapper(unsigned short port,unsigned char* ret);
 static unsigned char read_data(unsigned short port);
 static unsigned char write_data(unsigned short port, unsigned char func);
 
@@ -22,7 +22,8 @@ unsigned char __inbyte_impl(unsigned short port) {
 
 bool setup_tablet(unsigned short port, bool as_emulation, bool as_mouse)
 {
-	unsigned char data = 0; // al
+	unsigned char data = 0;
+	unsigned char ret = 0;
 
 	//if (DTR==HIGH && DTS==HIGH)
 	if (0 == (read_mcr(port) & 0b11))
@@ -35,7 +36,7 @@ bool setup_tablet(unsigned short port, bool as_emulation, bool as_mouse)
 	delay_ms(4);
 
 	write_data(port, 0x3F);
-	data = read_data_wrapper(port);
+	data = read_data_wrapper(port,&ret);
 	if (data != 0)
 	{
 		switch (data) {
@@ -126,11 +127,29 @@ unsigned char read_lsr(unsigned short port)
 	//´«ÊäÏß×´Ì¬¼Ä´æÆ÷
 	return __inbyte_impl(port + 5);
 }
-unsigned char read_data_wrapper(unsigned short port)
+unsigned char read_data_wrapper(unsigned short port,unsigned char* pret)
 {
+	if(pret!=0) *pret = 0;
 	unsigned char result = read_data(port);
 	if (result == 0x53)
 		result = 0x06;
+	switch (result) {
+	case 0x53:
+		result = 0x06;
+		if (pret != 0) *pret = 0;
+		break;
+	case 0x2:
+	case 0x3:
+	case 0x4:
+	case 0x6:
+		if (pret != 0) *pret = 0;
+		break;
+	case 0x8:
+		if (pret != 0) *pret = 1;
+		break;
+	default:
+		break;
+	}
 	return result;
 }
 
