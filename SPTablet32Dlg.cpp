@@ -7,6 +7,7 @@
 #include "SPTablet32App.h"
 #include "SPTablet32Dlg.h"
 #include "afxdialogex.h"
+#include "SPTablet32API.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -65,6 +66,7 @@ BEGIN_MESSAGE_MAP(CSPTablet32Dlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_BUTTON_TEST, &CSPTablet32Dlg::OnBnClickedButtonTest)
 END_MESSAGE_MAP()
 
 
@@ -153,3 +155,9 @@ HCURSOR CSPTablet32Dlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+
+void CSPTablet32Dlg::OnBnClickedButtonTest()
+{
+	bool done = setup_tablet(_T("\\\\.\\COM3"));
+}

@@ -27,11 +27,10 @@ bool setup_tablet(unsigned short port, bool as_emulation, bool as_mouse)
 	unsigned char data = 0;
 	unsigned char ret = 0;
 
-	//if (DTR==HIGH && DTS==HIGH)
-	//if (0 == (read_mcr(port) & 0b11))
-	//{
-	//	write_mcr_delay(port, 28);
-	//}
+	if (0 == (read_mcr(port) & 0b11))
+	{
+		write_mcr_delay(port, 28);
+	}
 	do_handshake(port);
 	set_interrupt(port);
 	write_data(port, 0);
@@ -158,7 +157,7 @@ unsigned char read_data(unsigned short port)
 {
 	DWORD v0; // ah
 	signed int v1; // ecx
-	unsigned char status; // al
+	unsigned char is_read_ready; // al
 	bool v3; // zf
 
 	v0 = GetTickCount();
@@ -166,8 +165,8 @@ unsigned char read_data(unsigned short port)
 	while (1)
 	{
 		//¶ÁÈ¡ ´«ÊäÏß×´Ì¬¼Ä´æÆ÷
-		status = read_lsr(port);
-		if (status & 1)
+		is_read_ready = read_lsr(port);
+		if (is_read_ready & 1)
 			break;
 		v3 = (v0 == GetTickCount());
 		if (v0 != GetTickCount())
@@ -175,7 +174,7 @@ unsigned char read_data(unsigned short port)
 			v0 = GetTickCount();
 			--v1;
 			if (!v3 || !v1)
-				return status;
+				return is_read_ready;
 		}
 	}
 	//

@@ -72,6 +72,15 @@
     <None Include="SPTablet32.cpp">
       <Filter>源文件</Filter>
     </None>
+    <None Include="SPTabletDOS\SPTablet.asm">
+      <Filter>源文件</Filter>
+    </None>
+    <None Include="SPTabletDOS\SPTablet32.asm">
+      <Filter>源文件</Filter>
+    </None>
+    <None Include="SPTabletDOS\SPTablet32.c">
+      <Filter>源文件</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\SPTablet32.ico">

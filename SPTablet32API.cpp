@@ -2,28 +2,70 @@
 #include "SPTablet32API.h"
 
 static void delay_ms(DWORD count);
-static void do_handshake(HANDLE hComm);
+static bool do_handshake(HANDLE hComm);
 static bool write_data(HANDLE hComm, unsigned char data);
 static bool read_data(HANDLE hComm, unsigned char* pdata);
 static bool set_baud_rate(HANDLE hComm, unsigned char byte_size, unsigned char use_parity, unsigned char parity, unsigned short baud_rate);
+static int read_mcr(HANDLE hComm) {
 
+	DWORD stat = 0;
+	BOOL done = GetCommModemStatus(hComm, &stat);
+	if (done) {
+		return (((stat & MS_DSR_ON) != 0) << 1) | ((stat & MS_CTS_ON) != 0);
+	}
+	return 0;
+}
+static bool write_mcr(HANDLE hComm,bool dtr,bool rts) {
+	// MCR 用来控制调制解调器的接口信号。
+	//	Bit0：设为1时，DTR脚位为LOW；设为0时，DTR脚位为HIGH。
+	//	Bit1：设为1时，RTS脚位为LOW；设为0时，RTS脚位为HIGH
+	//	Bit2，Bit3：用于控制芯片上的输出，新型芯片现已不用。
+	//	Bit4：：设为1时，芯片内部作自我诊断。
+	//	其他位永远为0
+	// 0000 1011
+	//	outportb(0x3fc, 0x0b);  //见上 
+	
+	BOOL done = TRUE;
+	if (dtr) {
+		done &= EscapeCommFunction(hComm, SETDTR);
+	}
+	else {
+		done &= EscapeCommFunction(hComm, CLRDTR);
+
+	}
+	if (rts) {
+		done &= EscapeCommFunction(hComm, SETRTS);
+	}
+	else {
+		done &= EscapeCommFunction(hComm, CLRRTS);
+
+	}
+	return done!=0;
+}
 bool setup_tablet(LPCTSTR com_port, bool as_emulation, bool as_mouse)
 {
 	bool done = false;
 	unsigned char data = 0;
-	HANDLE hComm = CreateFile(com_port,
-		OPEN_EXISTING,
+	HANDLE hComm = CreateFile(
+		com_port,
 		GENERIC_READ | GENERIC_WRITE,
-		0,
 		0, //FILE_SHARE_NONE 
-		0,
+		NULL,
+		OPEN_EXISTING,
+		FILE_ATTRIBUTE_NORMAL,
 		NULL
 	);
 	if (hComm != INVALID_HANDLE_VALUE) {
-		do_handshake(hComm);
-		write_data(hComm, 0);
+		//reset modem
+		if ((read_mcr(hComm)&0x3) == 0) {
+			write_mcr(hComm, true, true);
+			delay_ms(28);
+		}
+
+		done = do_handshake(hComm);
+		done = write_data(hComm, 0);
 		delay_ms(4);
-		write_data(hComm, 0x3F);
+		done = write_data(hComm, 0x3F);
 		if (read_data(hComm, &data))
 		{
 			switch (data) {
@@ -70,8 +112,9 @@ void delay_ms(DWORD count) {
 }
 bool write_data(HANDLE hComm, unsigned char data)
 {
-	DWORD n = 0;
-	return WriteFile(hComm, &data, sizeof(data), &n, NULL) && n == sizeof(data);
+	return TransmitCommChar(hComm, data);
+//	DWORD n = 0;
+//	return WriteFile(hComm, &data,sizeof(data),&n,NULL) &&n==sizeof(data);
 }
 bool read_data(HANDLE hComm, unsigned char* pdata)
 {
@@ -94,7 +137,7 @@ Bit5：指定奇偶校验位的方式。设为0时表示不限制；设为1时，则选择奇校验时，奇偶校验
 Bit6：终止控制位。设为0时表示正常输出；设为1时则强迫输出0。
 Bit7：除法器轩锁位。设为0时表示存取信息寄存器；设为1时表示存取波特率分频器。
 
-2, 1200:
+2, 1200:	
 0000 0010=7Bits, 1200bps， 1stop, none parity, no force
 11, 9600:
 0000 1011=8Bits, 9600, odd parity
@@ -110,13 +153,14 @@ bool set_baud_rate(HANDLE hComm, unsigned char byte_size, unsigned char use_pari
 	dcb.BaudRate = baud_rate;
 	return SetCommState(hComm, &dcb) != 0;
 }
-void do_handshake(HANDLE hComm)
+bool do_handshake(HANDLE hComm)
 {
 	//7bits
-	set_baud_rate(hComm, 7, 0, 0, 1200); //0010，1200
-	write_data(hComm, 0);
+	bool done = set_baud_rate(hComm, 7, 0, 0, 1200); //0010，1200
+	done &= write_data(hComm, 0);
 	delay_ms(2);
-	write_data(hComm, 0x58);
+	done &= write_data(hComm, 0x58);
 	delay_ms(4);
-	set_baud_rate(hComm, 8,1,0, 9600); //1011,9600
+	done &= set_baud_rate(hComm, 8,1,0, 9600); //1011,9600
+	return done;
 };

@@ -16,12 +16,12 @@ includelib C:\masm32\lib\kernel32.lib
 ; Attributes: noreturn
 public start
 start:
-                mov     byte_1046C, 0FFh
+                mov     choice, 0FFh
                 nop
 
 loc_1011D:                              
                                         
-                call    ProcessArguments
+                call    parse_arguments
                 jnb     short loc_10130
                 nop
                 nop
@@ -42,7 +42,7 @@ loc_10130:
                 nop
                 nop
                 nop
-                mov     byte_1046C, 0
+                mov     choice, 0
                 nop
                 mov     port, 3F8h
                 jmp     short loc_1011D
@@ -54,25 +54,25 @@ loc_10145:
                 nop
                 nop
                 nop
-                mov     byte_1046C, 0
+                mov     choice, 0
                 nop
                 mov     port, 2F8h
                 jmp     short loc_1011D
 ; ---------------------------------------------------------------------------
 
 loc_1015A:                              
-                cmp     al, 45h
+                cmp     al, 'E'
                 jnz     short loc_10169
                 nop
                 nop
                 nop
-                mov     byte_10471, 1
+                mov     as_emulation, 1
                 nop
                 jmp     short loc_1011D
 ; ---------------------------------------------------------------------------
 
 loc_10169:                              
-                cmp     al, 3Fh
+                cmp     al, '?'
                 jnz     short loc_10173
                 nop
                 nop
@@ -81,30 +81,30 @@ loc_10169:
 ; ---------------------------------------------------------------------------
 
 loc_10173:                              
-                cmp     al, 4Dh
+                cmp     al, 'M'
                 jnz     short loc_1012D
-                mov     byte_10470, 0
+                mov     as_mouse, 0
                 nop
                 jmp     short loc_1011D
 ; ---------------------------------------------------------------------------
 
 loc_1017F:                              
                                         
-                call    sub_102C1
+                call    read_mcr
                 and     al, 3
                 jnz     short loc_10192
                 nop
                 nop
                 nop
-                call    sub_102AA
+                call    write_mcr_1011_and_delay
                 mov     eax, 1Bh
                 call    delay_ms
 
 loc_10192:                              
-                call    sub_103E0
-                call    sub_10377
+                call    do_handshake
+                call    set_interrupt
                 mov     al, 0
-                call    sub_102E8
+                call    write_data
                 mov     eax, 4
                 call    delay_ms
                 mov     ecx, 2
@@ -112,22 +112,22 @@ loc_10192:
 loc_101A6:                              
                 push    ecx
                 mov     al, 3Fh
-                call    sub_102E8
-                call    sub_10314
+                call    write_data
+                call    read_data_sp
                 pop     ecx
                 jnb     short loc_101D1
                 nop
                 nop
                 nop
                 loopne  loc_101A6
-                cmp     byte_1046C, 0FFh
+                cmp     choice, 0FFh
                 nop
                 jz      short loc_101C2
                 jmp     loc_1028F
 ; ---------------------------------------------------------------------------
 
 loc_101C2:                              
-                mov     byte_1046C, 0
+                mov     choice, 0
                 nop
                 mov     edi, 2F8h
                 mov     port, edi
@@ -164,7 +164,7 @@ loc_101D1:
 ; ---------------------------------------------------------------------------
 
 loc_101F7:                              
-                cmp     byte_10470, 1
+                cmp     as_mouse, 1
                 jnz     short loc_10206
                 nop
                 nop
@@ -182,18 +182,18 @@ loc_10206:
 ; ---------------------------------------------------------------------------
 
 loc_1020B:                              
-                cmp     byte_10470, 1
+                cmp     as_mouse, 1
                 jnz     short loc_10233
                 nop
                 nop
                 nop
-                cmp     byte_10471, 1
+                cmp     as_emulation, 1
                 jz      short loc_10229
                 nop
                 nop
                 nop
                 mov     al, 58h
-                call    sub_102E8
+                call    write_data
                 mov     al, 6Fh
                 jmp     short loc_10258
 ; ---------------------------------------------------------------------------
@@ -202,7 +202,7 @@ loc_1020B:
 
 loc_10229:                              
                 mov     al, 4Fh
-                call    sub_102E8
+                call    write_data
                 mov     al, 62h
                 jmp     short loc_10258
 ; ---------------------------------------------------------------------------
@@ -216,12 +216,12 @@ loc_10233:
                 nop
 
 loc_10238:                              
-                cmp     byte_10470, 1
+                cmp     as_mouse, 1
                 jnz     short loc_10256
                 nop
                 nop
                 nop
-                cmp     byte_10471, 1
+                cmp     as_emulation, 1
                 jz      short loc_10251
                 nop
                 nop
@@ -243,11 +243,11 @@ loc_10256:
 
 loc_10258:                              
                                         
-                call    sub_102E8
+                call    write_data
 
 loc_1025B:                              
                                         
-                cmp     byte_10470, 1
+                cmp     as_mouse, 1
                 jnz     short loc_10283
                 nop
                 nop
@@ -325,8 +325,7 @@ loc_102A5:
 
 ; =============== S U B R O U T I N E =======================================
 
-
-sub_102AA:              
+write_mcr_1011_and_delay proc              
                 mov     edi, port
                 lea     edx, [edi+4]
                 mov     al, 0Bh
@@ -346,10 +345,11 @@ loc_102B9:
                 mov     eax, 1
                 call    delay_ms
                 retn
+write_mcr_1011_and_delay endp     
 ; =============== S U B R O U T I N E =======================================
 
 
-sub_102C1       proc            
+read_mcr       proc            
                 mov     edi, port
                 lea     edx, [edi+4]
                 jmp     short $+2
@@ -367,7 +367,7 @@ loc_102CE:
                 in      al, dx
                 retn
 
-sub_102C1       endp
+read_mcr       endp
 ; =============== S U B R O U T I N E =======================================
 
 
@@ -390,13 +390,7 @@ loc_102DB:
 delay_ms        endp
 ; =============== S U B R O U T I N E =======================================
 
-sub_102E0:              
-                mov     edi, port
-                lea     edx, [edi+4]
-; =============== S U B R O U T I N E =======================================
-
-
-sub_102E8:           
+write_data      proc          
                                         
                 push    edx
                 mov     ah, al
@@ -450,13 +444,14 @@ loc_10310:
 loc_10312:                              
                 pop     edx
                 retn
+write_data      endp          
 
 
 ; =============== S U B R O U T I N E =======================================
 
 
-sub_10314:              
-                call    sub_10345
+read_data_sp    proc          
+                call    read_data
                 cmp     al, 53h
                 jnz     short loc_10320
                 nop
@@ -499,11 +494,12 @@ loc_1036E_2:
                 stc
                 retn
 
+read_data_sp    endp          
 
 ; =============== S U B R O U T I N E =======================================
 
 
-sub_10345:           
+read_data       proc           
                 xor     eax, eax
                 mov     edi, port
                 lea     edx, [edi+5]
@@ -540,12 +536,13 @@ loc_10370:
 
 ; =============== S U B R O U T I N E =======================================
 
+read_data       endp           
 
-sub_10377:               
+set_interrupt   proc               
                 mov     edi, port
                 mov     ah, 0Bh
                 mov     ebx, 0Ch
-                call    sub_103B2
+                call    set_baud_rate
                 mov     edx, 21h
                 in      al, dx          ; Interrupt controller, 8259A.
                 cmp     port, 2F8h
@@ -594,11 +591,11 @@ loc_103B0:
                 out     dx, al
                 retn
 
-
+set_interrupt   endp
 ; =============== S U B R O U T I N E =======================================
 
 
-sub_103B2:             
+set_baud_rate   proc            
                                         
                 mov     edi, port
                 lea     edx, [edi+3]
@@ -651,32 +648,32 @@ loc_103DE:
                 out     dx, al
                 retn
 
-
+set_baud_rate   endp 
 ; =============== S U B R O U T I N E =======================================
 
 
-sub_103E0:             
+do_handshake    proc             
                 mov     ah, 2
                 mov     bx, 60h
-                call    sub_103B2
+                call    set_baud_rate
                 mov     al, 0
-                call    sub_102E8
+                call    write_data
                 mov     ax, 2
                 call    delay_ms
                 mov     al, 58h
-                call    sub_102E8
+                call    write_data
                 mov     ax, 4
                 call    delay_ms
                 mov     ah, 0Bh
                 mov     bx, 0Ch
-                call    sub_103B2
+                call    set_baud_rate
                 retn
 
-
+do_handshake    endp
 ; =============== S U B R O U T I N E =======================================
 
 
-SkipWhitespaces:              
+skipws          proc            
                                         
                 mov     al, [ebx]
                 cmp     al, 0Dh
@@ -702,18 +699,18 @@ loc_10415:                              ;
                 nop
                 nop
                 inc     ebx
-                jmp     short SkipWhitespaces
+                jmp     short skipws
 ; ---------------------------------------------------------------------------
 
 locret_10426:                           
                                         
                 retn
 
-
+skipws          endp
 ; =============== S U B R O U T I N E =======================================
 
 
-ProcessArguments:          
+parse_arguments proc         
                 mov     ebx, args
                 cmp     ebx, 80h
                 jnz     short loc_10444
@@ -739,7 +736,7 @@ loc_10440:
 
 loc_10444:                              
                                         
-                call    SkipWhitespaces
+                call    skipws
                 mov     al, [ebx]
                 cmp     al, 2Dh
                 jz      short loc_10460
@@ -768,15 +765,16 @@ loc_10460:
                 clc
                 retn
 
+parse_arguments endp         
 
 .data
 
-byte_1046C      db 0                    
+choice          db 0                    
                 db 10h
 port            dd 3F8h                 
                                         
-byte_10470      db 1                    
-byte_10471      db 0                    
+as_mouse      db 1                    
+as_emulation      db 0                    
 args            dd 80h                  
 
 aTitle          db 'SPTablet32',0                             
@@ -790,14 +788,14 @@ aTabletConnectT db 'Tablet Connect to COM1.',0Dh,0Ah,'$'
 aTabletConnectT_0 db 'Tablet Connect to COM2.',0Dh,0Ah,'$'
 aThisProgramCan db 'This program can not run within Windows!',0Dh,0Ah
                 db 'Exit Wiindows, and run this form DOS prompt.',7,7,0Dh,0Ah,'$'
-aSptabletCanUse db 'SPTablet      ;can use following command.',0Dh,0Ah
-                db '  /?          ;This message.',0Dh,0Ah
-                db '  /x          ;x = 1 or 2 to setup COM1 or COM2.',0Dh,0Ah
-                db '  /E          ;Set Emulation On. SP345 will emulate MM9601,',0Dh,0Ah
-                db '              ;                  SP66 will emulate MM1212. ',0Dh,0Ah
-                db '  /M          ;Set Emulation Microsoft Mouse On.',0Dh,0Ah
-                db '              ;If no /M this will set to MM series tablet.',0Dh,0Ah
+aSptabletCanUse db 'SPTablet      can use following command.',0Dh,0Ah
+                db '  /?          This message.',0Dh,0Ah
+                db '  /x          x = 1 or 2 to setup COM1 or COM2.',0Dh,0Ah
+                db '  /E          Set Emulation On. SP345 will emulate MM9601,',0Dh,0Ah
+                db '                                SP66 will emulate MM1212. ',0Dh,0Ah
+                db '  /M          Set Emulation Microsoft Mouse On.',0Dh,0Ah
+                db '              If no /M this will set to MM series tablet.',0Dh,0Ah
                 db '$'
-                db    0
+                db  0
                 db 13 dup(0)
 end
