@@ -42,7 +42,7 @@ start           proc near
                 nop
                 nop
                 nop
-                mov     dx, 533h
+                mov     dx, offset aThisProgramCan
                 jmp     loc_10292
 ; ---------------------------------------------------------------------------
 
@@ -286,7 +286,7 @@ loc_1025B:                              ; CODE XREF: start+E8?j
                 nop
                 nop
                 nop
-                mov     dx, 4D6h
+                mov     dx, offset aSetTabletModeO
                 mov     ah, 9
                 int     21h             ; DOS - PRINT STRING
                                         ; DS:DX -> string terminated by "$"
@@ -295,21 +295,21 @@ loc_1025B:                              ; CODE XREF: start+E8?j
                 nop
                 nop
                 nop
-                mov     dx, 4FFh
+                mov     dx, offset aTabletConnectT
                 jmp     short loc_10286
 ; ---------------------------------------------------------------------------
                 db 90h
 ; ---------------------------------------------------------------------------
 
 loc_1027D:                              ; CODE XREF: start+172?j
-                mov     dx, 519h
+                mov     dx, offset aTabletConnectT_0
                 jmp     short loc_10286
 ; ---------------------------------------------------------------------------
                 db 90h
 ; ---------------------------------------------------------------------------
 
 loc_10283:                              ; CODE XREF: start+160?j
-                mov     dx, 4ECh
+                mov     dx, offset aResetTabletOk
 
 loc_10286:                              ; CODE XREF: start+17A?j
                                         ; start+180?j
@@ -322,7 +322,7 @@ loc_10286:                              ; CODE XREF: start+17A?j
 ; ---------------------------------------------------------------------------
 
 loc_1028F:                              ; CODE XREF: start+BF?j
-                mov     dx, 4A5h
+                mov     dx, offset aTabletIsNotRes
 
 loc_10292:                              ; CODE XREF: start+10?j
                                         ; start+19E?j ...
@@ -335,17 +335,17 @@ loc_10292:                              ; CODE XREF: start+10?j
 ; ---------------------------------------------------------------------------
 
 loc_1029B:                              ; CODE XREF: start+F4?j
-                mov     dx, 4C3h
+                mov     dx, offset aNotSpTablet
                 jmp     short loc_10292
 ; ---------------------------------------------------------------------------
 
 loc_102A0:                              ; CODE XREF: start:loc_1012D?j
-                mov     dx, 474h
+                mov     dx, offset aParameterError
                 jmp     short loc_10292
 ; ---------------------------------------------------------------------------
 
 loc_102A5:                              ; CODE XREF: start+70?j
-                mov     dx, 58Eh
+                mov     dx, offset aSptabletCanUse
                 jmp     short loc_10292
 start           endp
 
