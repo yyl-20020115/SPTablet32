@@ -6,12 +6,14 @@ static void delay_ms(int count);
 static void write_mcr_delay(unsigned short port, int count);
 static void set_interrupt(unsigned short port);
 static void do_handshake(unsigned short port);
-static void set_baudrate(unsigned short port, unsigned char val, unsigned short baud_factor);
+static void set_baud_rate_factor(unsigned short port, unsigned char controls, unsigned short baud_factor);
+static void write_data(unsigned short port, unsigned char data);
 static unsigned char read_mcr(unsigned short port);
 static unsigned char read_lsr(unsigned short port);
 static unsigned char read_data_wrapper(unsigned short port,unsigned char* ret);
 static unsigned char read_data(unsigned short port);
-static unsigned char write_data(unsigned short port, unsigned char func);
+static unsigned short get_baud_factor(unsigned int baud_rate);
+static unsigned short get_baud_rate(unsigned short baud_factor);
 
 void __outbyte_impl(unsigned short port, unsigned char data) {
 	__outbyte(port, data);
@@ -26,10 +28,10 @@ bool setup_tablet(unsigned short port, bool as_emulation, bool as_mouse)
 	unsigned char ret = 0;
 
 	//if (DTR==HIGH && DTS==HIGH)
-	if (0 == (read_mcr(port) & 0b11))
-	{
-		write_mcr_delay(port, 28);
-	}
+	//if (0 == (read_mcr(port) & 0b11))
+	//{
+	//	write_mcr_delay(port, 28);
+	//}
 	do_handshake(port);
 	set_interrupt(port);
 	write_data(port, 0);
@@ -106,7 +108,7 @@ void delay_ms(int count)
 	while (result > GetTickCount());
 }
 
-unsigned char write_data(unsigned short port, unsigned char data)
+void write_data(unsigned short port, unsigned char data)
 {
 	unsigned char status; // al
 
@@ -119,7 +121,6 @@ unsigned char write_data(unsigned short port, unsigned char data)
 	} while (0 == (status & 0x20)); //0010 0000
 	//3F8:传送信息/接收信息寄存器
 	__outbyte_impl(port, data);
-	return data;
 }
 unsigned char read_lsr(unsigned short port)
 {
@@ -186,7 +187,7 @@ void set_interrupt(unsigned short port)
 	unsigned char in_data; // al
 	unsigned char out_data; // al
 
-	set_baudrate(port, 11, 12); //1200bps
+	set_baud_rate_factor(port, 11, 12); //1200bps
 	in_data = __inbyte_impl(0x21);
 	//8259A PIC
 	//0x20: Control Port
@@ -209,11 +210,6 @@ void set_interrupt(unsigned short port)
 	__outbyte_impl(port + 1, 1);
 }
 
-unsigned short get_baud_factor(unsigned int baud_rate)
-{
-	return 1843200 / (16 * baud_rate);
-}
-
 //可以有两种波特率选择
 //2,96  : 0010,96->1200(bps) DTS
 //11,12:  1011,12->9600(bps) DTS+DTR+CONTROL
@@ -221,7 +217,7 @@ unsigned short get_baud_factor(unsigned int baud_rate)
 //Bit1：设为1时，DTS脚位为LOW；设为0时，RTS脚位为HIGH
 //Bit2，Bit3：用于控制芯片上的输出，新型芯片现已不用。
 
-void set_baudrate(unsigned short port, unsigned char val, unsigned short baud_factor)
+void set_baud_rate_factor(unsigned short port, unsigned char controls, unsigned short baud_factor)
 {
 	//3F8+3=3FB:传输线控制寄存器LCR
 	//对LCR的最高位置‘1',是说明以下为输入波特率因子
@@ -230,15 +226,23 @@ void set_baudrate(unsigned short port, unsigned char val, unsigned short baud_fa
 	__outbyte_impl(port + 0, LOBYTE(baud_factor));
 	__outbyte_impl(port + 1, HIBYTE(baud_factor));
 	//3F8+3=3FB:传输线控制寄存器LCR
-	__outbyte_impl(port + 3, val);
+	__outbyte_impl(port + 3, controls);
 }
 
 void do_handshake(unsigned short port)
 {
-	set_baudrate(port, 2, 96); //0010，1200
+	set_baud_rate_factor(port, 2, 96); //0010，1200
 	write_data(port, 0);
 	delay_ms(2);
 	write_data(port, 0x58);
 	delay_ms(4);
-	set_baudrate(port, 11, 12); //1011,9600
+	set_baud_rate_factor(port, 11, 12); //1011,9600
+}
+static unsigned short get_baud_factor(unsigned int baud_rate)
+{
+	return 1843200 / (16 * baud_rate);
+}
+static unsigned short get_baud_rate(unsigned short baud_factor)
+{
+	return 1843200 / baud_factor / 16;
 }

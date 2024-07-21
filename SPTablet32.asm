@@ -78,7 +78,7 @@ main            proc
                 call    read_mcr
                 and     al, 3  ;CTS=1,DTR=1
                 jnz     @on_cts_dtr_ready
-                call    write_msr_with_delay
+                call    write_msr_delay
                 mov     eax, 1Bh
                 call    delay_ms
 
@@ -231,7 +231,7 @@ main            proc
                 jmp     @exit_program_with_error
 main            endp
 
-write_msr_with_delay    proc           
+write_msr_delay    proc           
                 mov     edi, current_port
                 lea     edx, [edi+4]    ; MSR
                 mov     eax, 0Bh        ; 00001011
@@ -240,7 +240,7 @@ write_msr_with_delay    proc
                 call    delay_ms
                 retn
 
-write_msr_with_delay    endp
+write_msr_delay    endp
 
 read_mcr        proc         
                 mov     edi, current_port

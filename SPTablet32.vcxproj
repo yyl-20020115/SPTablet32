@@ -187,6 +187,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SPTablet32.h" />
+    <ClInclude Include="SPTablet32API.h" />
     <ClInclude Include="SPTablet32App.h" />
     <ClInclude Include="SPTablet32Dlg.h" />
     <ClInclude Include="targetver.h" />
@@ -198,7 +199,17 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="SPTablet32.cpp" />
+    <None Include="SPTablet32.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ExcludedFromBuild>
+    </None>
+    <ClCompile Include="SPTablet32API.cpp" />
     <ClCompile Include="SPTablet32App.cpp" />
     <ClCompile Include="SPTablet32Dlg.cpp" />
   </ItemGroup>
@@ -206,6 +217,7 @@
     <ResourceCompile Include="SPTablet32.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="comport.html" />
     <None Include="res\SPTablet32.rc2" />
     <None Include="SPTablet.asm" />
     <None Include="SPTablet32.asm" />

@@ -1,0 +1,77 @@
+<html>
+
+<head>
+    <title></title>
+</head>
+<body>
+    <article class="baidu_pl">
+        <div id="article_content" class="article_content clearfix">
+        <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/kdoc_html_views-1a98987dfd.css">
+        <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/ck_htmledit_views-044f2cf1dc.css">
+             
+                <div id="content_views" class="htmledit_views">
+                    &nbsp; 
+<p><span style="font-size:18px">PC机上，COM1和COM2的地址是3F8~3FF 及2F8~2FF，在这个范围内的每个地址都有不同的功能，这些功能分别通过寄存器来实现，读写这些寄存器就可以执行与串行端口相关的功能。而所谓的寄存器就是暂时存放信息的地方，这些被存放在此的信息是以位的形式存储，通常以8个位（一个字节）作为一个单位。读写这些寄存器地址的同时，也就是读取这些代表的状态或控制某些功能。</span></p> 
+<p><span style="font-size:18px">&nbsp;&nbsp;&nbsp; </span></p> 
+<div class="table-box"><table cellspacing="0" cellpadding="0" border="1"><tbody><tr><td> <p align="center"><span style="font-size:18px">COM1</span></p> </td><td> <p align="center"><span style="font-size:18px">COM2</span></p> </td><td> <p align="center"><span style="font-size:18px">寄存器名称</span></p> </td><td> <p align="center"><span style="font-size:18px">简称</span></p> </td></tr><tr><td> <p align="center"><span style="font-size:18px">3F8</span></p> </td><td> <p align="center"><span style="font-size:18px">2F8</span></p> </td><td> <p align="center"><span style="font-size:18px">波特率分频器（低八位）</span></p> </td><td> <p align="center"><span style="font-size:18px">BDR</span></p> </td></tr><tr><td> <p align="center"><span style="font-size:18px">3F9</span></p> </td><td> <p align="center"><span style="font-size:18px">2F9</span></p> </td><td> <p align="center"><span style="font-size:18px">波特率分频器（高八位）</span></p> </td><td> <p align="center"><span style="font-size:18px">BDR</span></p> </td></tr><tr><td> <p align="center"><span style="font-size:18px">3F8</span></p> </td><td> <p align="center"><span style="font-size:18px">2F8</span></p> </td><td> <p align="center"><span style="font-size:18px">传送信息/接收信息寄存器</span></p> </td><td> <p align="center"><span style="font-size:18px">DR</span></p> </td></tr><tr><td> <p align="center"><span style="font-size:18px">3F9</span></p> </td><td> <p align="center"><span style="font-size:18px">2F9</span></p> </td><td> <p align="center"><span style="font-size:18px">中断启动寄存器</span></p> </td><td> <p align="center"><span style="font-size:18px">IER</span></p> </td></tr><tr><td> <p align="center"><span style="font-size:18px">3FA</span></p> </td><td> <p align="center"><span style="font-size:18px">2FA</span></p> </td><td> <p align="center"><span style="font-size:18px">中断辨识寄存器</span></p> </td><td> <p align="center"><span style="font-size:18px">IIR</span></p> </td></tr><tr><td> <p align="center"><span style="font-size:18px">3FB</span></p> </td><td> <p align="center"><span style="font-size:18px">2FB</span></p> </td><td> <p align="center"><span style="font-size:18px">传输线控制寄存器</span></p> </td><td> <p align="center"><span style="font-size:18px">LCR</span></p> </td></tr><tr><td> <p align="center"><span style="font-size:18px">3FC</span></p> </td><td> <p align="center"><span style="font-size:18px">2FC</span></p> </td><td> <p align="center"><span style="font-size:18px">调制解调器控制寄存器</span></p> </td><td> <p align="center"><span style="font-size:18px">MCR</span></p> </td></tr><tr><td> <p align="center"><span style="font-size:18px">3FD</span></p> </td><td> <p align="center"><span style="font-size:18px">2FD</span></p> </td><td> <p align="center"><span style="font-size:18px">传输线状态寄存器</span></p> </td><td> <p align="center"><span style="font-size:18px">LSR</span></p> </td></tr><tr><td> <p align="center"><span style="font-size:18px">3FE</span></p> </td><td> <p align="center"><span style="font-size:18px">2FE</span></p> </td><td> <p align="center"><span style="font-size:18px">调制解调器状态寄存器</span></p> </td><td> <p align="center"><span style="font-size:18px">MSR</span></p> </td></tr></tbody></table></div> 
+<p><span style="font-size:18px">上表中，3F8，3F9及2F8，2F9分别有两种功能，显然还需要其他寄存器的信号来加以区别。</span></p> 
+<p><span style="font-size:18px">在串行通信中，这一点是通过使用传输线控制寄存器（LCR）上的第7位来实现的。这个位被称为分频器锁存器存取位（Divistor Latch Access Bit,DLAB）,当DLAB为0时，表示读写信息寄存器和中断启动寄存器；当DLAB为1时，表示读写波特率分频器的内容。</span></p> 
+<p><span style="font-size:18px">以下是各寄存器的说明：</span></p> 
+<p><span style="font-size:18px">l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BDR：设置使用串行通信的传输速度。</span></p> 
+<p><span style="font-size:18px">串口波特率和数据格式的设置：</span></p> 
+<p><span style="font-size:18px">首先向LCR（传输线控制寄存器）的高位写入1（即DLAB为1），然后再设置波特率：在基地址和基地址+1的地方写入的数据为1843200/（16*波特率）。然后设置LCR，最后设置Modem控制寄存器和中断允许寄存器。波特率数值=1843200/（16*波特率）（十进制，可转化为十六进制）</span></p> 
+<p><span style="font-size:18px">outportb(0x3fb,0x80); 对LCR的最高位置‘1',是说明以下为输入波特率因子</span></p> 
+<p><span style="font-size:18px">outportb(0x3f8,0x0c); //outportb(0x3f8+0,0x0C)输入波特率因子的低8位/9600</span></p> 
+<p><span style="font-size:18px">outportb(0x3f9,0x00); //outportb(0x3f8+1,0x00) 输入波特率因子的高8位</span></p> 
+<p><span style="font-size:18px">l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DR&nbsp; 先令DLAB为0，再读取3F8就等于读取被传送到COM1的信息。若将信息写入3F8，则信息会被放入传送寄存器中，并被芯片内的移位寄存器一位接着一位地送出去。</span></p> 
+<p><span style="font-size:18px">l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IER&nbsp; 用来启动芯片中的4种中断，该位为1时表示该中断被启动。</span></p> 
+<p><span style="font-size:18px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bit0：接收的信息有效中断启动。</span></p> 
+<p><span style="font-size:18px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bit1：传送器保持寄存器已空中断启动</span></p> 
+<p><span style="font-size:18px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bit2：接收器连接状态中断启动</span></p> 
+<p><span style="font-size:18px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bit3：调制解调器状态中断启动</span></p> 
+<p><span style="font-size:18px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bit4－Bit7：永远为0</span></p> 
+<p><span style="font-size:18px">outportb(0x3f9,0x01); //启动中断，接收数据有效</span></p> 
+<p><span style="font-size:18px">l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IIR&nbsp; 通过读取此寄存器可以知道中断的产生是由谁所引发。</span></p> 
+<p><span style="font-size:18px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bit0：为0时表示尚有中断未处理；为1时表示无中断。</span></p> 
+<div class="table-box"><table cellspacing="0" cellpadding="0" border="1"><tbody><tr><td> <p align="center"><span style="font-size:18px">Bit2</span></p> </td><td> <p align="center"><span style="font-size:18px">Bit1</span></p> </td><td> <p align="center"><span style="font-size:18px">中断来源</span></p> </td></tr><tr><td> <p align="center"><span style="font-size:18px">0</span></p> </td><td> <p align="center"><span style="font-size:18px">0</span></p> </td><td> <p align="center"><span style="font-size:18px">调制解调器状态</span></p> </td></tr><tr><td> <p align="center"><span style="font-size:18px">0</span></p> </td><td> <p align="center"><span style="font-size:18px">1</span></p> </td><td> <p align="center"><span style="font-size:18px">传送器保存寄存器空着</span></p> </td></tr><tr><td> <p align="center"><span style="font-size:18px">1</span></p> </td><td> <p align="center"><span style="font-size:18px">0</span></p> </td><td> <p align="center"><span style="font-size:18px">接受信息为有效</span></p> </td></tr><tr><td> <p align="center"><span style="font-size:18px">1</span></p> </td><td> <p align="center"><span style="font-size:18px">1</span></p> </td><td> <p align="center"><span style="font-size:18px">连接控制状态</span></p> </td></tr></tbody></table></div> 
+<p><span style="font-size:18px">Bit3～Bit7 ：永远为0</span></p> 
+<p><span style="font-size:18px">outportb(0x3fa,0x07);&nbsp; //表示处于连接控制状态</span></p> 
+<p><span style="font-size:18px">l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LCR&nbsp; 此寄存器定义传输信息的格式。各位的意义如下：</span></p> 
+<div class="table-box"><table cellspacing="0" cellpadding="0" border="1"><tbody><tr><td> <p align="center"><span style="font-size:18px">Bit0</span></p> </td><td> <p align="center"><span style="font-size:18px">Bit1</span></p> </td><td> <p align="center"><span style="font-size:18px">意义</span></p> </td></tr><tr><td> <p align="center"><span style="font-size:18px">0</span></p> </td><td> <p align="center"><span style="font-size:18px">0</span></p> </td><td> <p align="center"><span style="font-size:18px">字符长度为5个位</span></p> </td></tr><tr><td> <p align="center"><span style="font-size:18px">0</span></p> </td><td> <p align="center"><span style="font-size:18px">1</span></p> </td><td> <p align="center"><span style="font-size:18px">字符长度为6个位</span></p> </td></tr><tr><td> <p align="center"><span style="font-size:18px">1</span></p> </td><td> <p align="center"><span style="font-size:18px">0</span></p> </td><td> <p align="center"><span style="font-size:18px">字符长度为7个位</span></p> </td></tr><tr><td> <p align="center"><span style="font-size:18px">1</span></p> </td><td> <p align="center"><span style="font-size:18px">1</span></p> </td><td> <p align="center"><span style="font-size:18px">字符长度为8个位</span></p> </td></tr></tbody></table></div> 
+<p><span style="font-size:18px">Bit2：终止位。设为0表示使用1个终止位；设为1时有两种情况，字符长度为5时表示1.5个终止位，而字符长度不是5时则表示2个终止位。</span></p> 
+<p><span style="font-size:18px">Bit3：奇偶校验位启动。设为0时表示无奇偶校验位，设为1时表示使用奇偶校验位。</span></p> 
+<p><span style="font-size:18px">Bit4：奇偶校验方式选择。设为0时选择奇校验；设为1时选择偶校验。</span></p> 
+<p><span style="font-size:18px">Bit5：指定奇偶校验位的方式。设为0时表示不限制；设为1时，则选择奇校验时，奇偶校验位为1；选择偶校验时，奇偶校验位为0。</span></p> 
+<p><span style="font-size:18px">Bit6：终止控制位。设为0时表示正常输出；设为1时则强迫输出0。</span></p> 
+<p><span style="font-size:18px">Bit7：除法器轩锁位。设为0时表示存取信息寄存器；设为1时表示存取波特率分频器。</span></p> 
+<p><span style="font-size:18px">outportb(0x3fb,0x80); //对LCR的最高位置‘1',是说明以下代码为输入波特率因子</span></p> 
+<p><span style="font-size:18px">l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MCR 用来控制调制解调器的接口信号。</span></p> 
+<p><span style="font-size:18px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bit0：设为1时，DTR脚位为LOW；设为0时，DTR脚位为HIGH。</span></p> 
+<p><span style="font-size:18px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bit1：设为1时，DTS脚位为LOW；设为0时，RTS脚位为HIGH</span></p> 
+<p><span style="font-size:18px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bit2，Bit3：用于控制芯片上的输出，新型芯片现已不用。</span></p> 
+<p><span style="font-size:18px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bit4：：设为1时，芯片内部作自我诊断。</span></p> 
+<p><span style="font-size:18px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 其他位永远为0</span></p> 
+<p><span style="font-size:18px">outportb(0x3fc,0x0b);&nbsp; //见上 </span></p> 
+<p><span style="font-size:18px">l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LSR 表示信息传送过程种的各种状态。各位为1时表示该状态成立，为0时不成立</span></p> 
+<p><span style="font-size:18px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bit0:数据已接收完毕。（Data Ready）</span></p> 
+<p><span style="font-size:18px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bit1：数据溢出错误。（Overrun Error）</span></p> 
+<p><span style="font-size:18px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bit2：奇偶校验位错误。（Parity Error）</span></p> 
+<p><span style="font-size:18px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bit3：信息框错误。（Framing Error）</span></p> 
+<p><span style="font-size:18px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;Bit4：终止中断。（Break Interrupt）</span></p> 
+<p><span style="font-size:18px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bit5：传送器保存寄存器空闲（Transmitter Holding Register Empty）。</span></p> 
+<p><span style="font-size:18px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bit6：传送移位寄存器空闲（Transmitter Shift Register Empty）。</span></p> 
+<p><span style="font-size:18px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bit7：永远为0</span></p> 
+<p><span style="font-size:18px">l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MSR 此寄存器高4位为调制解调器控制线目前状态；低4位在调制解调器有信号时被设为1，在被读取后会恢复为0。</span></p> 
+<p><span style="font-size:18px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bit0：1时表示CTS信号改变</span></p> 
+<p><span style="font-size:18px">&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Bit1：1时表示DSR信号改变</span></p> 
+<p><span style="font-size:18px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bit2：1时表示RI信号改变</span></p> 
+<p><span style="font-size:18px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bit3：1时表示DCD信号改变</span></p> 
+<p><span style="font-size:18px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bit4：CTS信号的补码</span></p> 
+<p><span style="font-size:18px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bit5：DSR的补码</span></p> 
+<p><span style="font-size:18px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bit6：RI信号的补码</span></p> 
+<p><span style="font-size:18px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bit7：DCD信号的补码。</span></p>
+                </div><div><div></div></div>
+        </div>
+    </article>
+</body>
+</html>
