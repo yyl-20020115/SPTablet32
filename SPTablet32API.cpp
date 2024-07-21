@@ -5,7 +5,7 @@ static void delay_ms(DWORD count);
 static void do_handshake(HANDLE hComm);
 static bool write_data(HANDLE hComm, unsigned char data);
 static bool read_data(HANDLE hComm, unsigned char* pdata);
-static bool set_baud_rate(HANDLE hComm, unsigned char controls, unsigned short baud_rate);
+static bool set_baud_rate(HANDLE hComm, unsigned char byte_size, unsigned char use_parity, unsigned char parity, unsigned short baud_rate);
 
 bool setup_tablet(LPCTSTR com_port, bool as_emulation, bool as_mouse)
 {
@@ -78,42 +78,45 @@ bool read_data(HANDLE hComm, unsigned char* pdata)
 	DWORD n = 0;
 	return ReadFile(hComm, pdata, sizeof(*pdata), &n, NULL) && n == sizeof(*pdata);
 }
-bool set_baud_rate(HANDLE hComm, unsigned char controls, unsigned short baud_rate)
-{
-	//BIT0=1 ;DTR
-	//BIT1=1 ;DTS
-	bool DTR = (controls & 0x1) != 0;
-	bool DTS = (controls & 0x2) != 0;
-	if (DTR)
-	{
-		EscapeCommFunction(hComm, SETDTR);
-	}
-	else {
-		EscapeCommFunction(hComm, CLRDTR);
-	}
-	if (DTS)
-	{
-		EscapeCommFunction(hComm, SETRTS);
-	}
-	else
-	{
-		EscapeCommFunction(hComm, CLRRTS);
-	}
+/*
+*
+Bit1 Bit0 Length
+0    0    5
+0    1    6
+1    0    7
+1    1    8
 
+Bit2：终止位。设为0表示使用1个终止位；设为1时有两种情况，字符长度为5时表示1.5个终止位，而字符长度不是5时则表示2个终止位。
+Bit3：奇偶校验位启动。设为0时表示无奇偶校验位，设为1时表示使用奇偶校验位。
+
+Bit4：奇偶校验方式选择。设为0时选择奇校验；设为1时选择偶校验。
+Bit5：指定奇偶校验位的方式。设为0时表示不限制；设为1时，则选择奇校验时，奇偶校验位为1；选择偶校验时，奇偶校验位为0。
+Bit6：终止控制位。设为0时表示正常输出；设为1时则强迫输出0。
+Bit7：除法器轩锁位。设为0时表示存取信息寄存器；设为1时表示存取波特率分频器。
+
+2, 1200:
+0000 0010=7Bits, 1200bps， 1stop, none parity, no force
+11, 9600:
+0000 1011=8Bits, 9600, odd parity
+
+*/
+bool set_baud_rate(HANDLE hComm, unsigned char byte_size, unsigned char use_parity, unsigned char parity, unsigned short baud_rate)
+{
 	DCB dcb = { 0 };
 	dcb.DCBlength = sizeof(dcb);
 	if (!GetCommState(hComm, &dcb)) return false;
+	dcb.ByteSize = byte_size;
+	dcb.Parity = use_parity ? parity:0;
 	dcb.BaudRate = baud_rate;
-	dcb.fDtrControl = DTR_CONTROL_ENABLE;
-	dcb.fRtsControl = RTS_CONTROL_ENABLE;
 	return SetCommState(hComm, &dcb) != 0;
 }
 void do_handshake(HANDLE hComm)
 {
-	set_baud_rate(hComm, 2, 1200); //0010，1200
+	//7bits
+	set_baud_rate(hComm, 7, 0, 0, 1200); //0010，1200
 	write_data(hComm, 0);
 	delay_ms(2);
 	write_data(hComm, 0x58);
 	delay_ms(4);
-	set_baud_rate(hComm, 11, 9600); //1011,9600
+	set_baud_rate(hComm, 8,1,0, 9600); //1011,9600
 };

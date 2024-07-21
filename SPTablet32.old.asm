@@ -385,7 +385,7 @@ set_baudrate proc
                 lea     edx, [edi+0]  ;baud rate low
                 mov     al, bl
                 out     dx, al
-                lea     edx, [edi+3]
+                lea     edx, [edi+3] ;lcr
                 mov     al, ah
                 out     dx, al
                 retn

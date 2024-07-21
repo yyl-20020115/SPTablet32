@@ -219,8 +219,7 @@
   <ItemGroup>
     <None Include="comport.html" />
     <None Include="res\SPTablet32.rc2" />
-    <None Include="SPTablet.asm" />
-    <None Include="SPTablet32.asm" />
+    <None Include="SPTablet32.old.asm" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\SPTablet32.ico" />

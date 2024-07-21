@@ -63,10 +63,7 @@
     <None Include="res\SPTablet32.rc2">
       <Filter>资源文件</Filter>
     </None>
-    <None Include="SPTablet.asm">
-      <Filter>源文件</Filter>
-    </None>
-    <None Include="SPTablet32.asm">
+    <None Include="SPTablet32.old.asm">
       <Filter>源文件</Filter>
     </None>
     <None Include="comport.html">
