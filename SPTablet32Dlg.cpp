@@ -74,9 +74,14 @@ void CSPTablet32Dlg::onReadEvent(const char* portName, unsigned int readBufferLe
 		{
 			int recLen = this->Port.readData(data, readBufferLen);
 			if (recLen > 0) {
+				for (int i = 0; i < recLen; i++) {
+					CString text;
+					text.Format(_T("%02X\r\n"), data[i]);
+					OutputDebugString(text);
+				}
 				size_t parts = this->Buffer.size() / PacketLength;
 				size_t reminder = this->Buffer.size() % PacketLength;
-				if (reminder == 0) {
+				if (reminder == 0 && parts>0) {
 					this->Buffer.clear();
 				}
 				else {
@@ -98,10 +103,11 @@ void CSPTablet32Dlg::onProcessPackets(const std::vector<unsigned char>& Buffer)
 	size_t _bmax = Buffer.size();
 	size_t _count = _bmax / PacketLength;
 	size_t _reminder = _bmax % PacketLength;
-
+	if (_count == 0) return;
 	if (_reminder > 0) {
 		_bmax -= _reminder;
 	}
+	
 	UINT ret = 0;
 	INPUT* inputs = new INPUT[_count];
 	if (inputs != nullptr) {
@@ -257,7 +263,8 @@ void CSPTablet32Dlg::OnBnClickedButtonStart()
 	CString COMPath = _T("\\\\.\\") + COM;
 
 	tablet_status status = setup_tablet(COMPath, mouse_system_protocol);
-	if (status > 0) {
+	if (status > 0) 
+	{
 		if (this->Port.isOpen()) {
 			this->Port.close();
 			this->Port.disconnectReadEvent();
@@ -267,9 +274,11 @@ void CSPTablet32Dlg::OnBnClickedButtonStart()
 		this->Port.init(
 			(CStringA)COM,
 			9600,
-			itas109::Parity(itas109::Parity::ParityOdd),
+			itas109::Parity(itas109::Parity::ParityNone),
 			itas109::DataBits(itas109::DataBits::DataBits8),
-			itas109::StopBits(itas109::StopBits::StopOne));
+			itas109::StopBits(itas109::StopBits::StopOne),
+			itas109::FlowControl::FlowHardware);
+		this->Port.setOperateMode();
 		if (this->Port.open())
 		{
 			this->PortsList.EnableWindow(FALSE);

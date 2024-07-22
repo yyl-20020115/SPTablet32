@@ -31,9 +31,16 @@ tablet_status setup_tablet(LPCTSTR com_port, mouse_protocol mouse_type, bool as_
 		//reset modem
 		COMMTIMEOUTS cmo = { 0 };
 		
-		GetCommTimeouts(hComm, &cmo);
-		cmo.ReadIntervalTimeout = 256;
-		SetCommTimeouts(hComm, &cmo);
+		done &= 0!=GetCommTimeouts(hComm, &cmo);
+		cmo.ReadTotalTimeoutConstant = 256;
+		done &= 0!=SetCommTimeouts(hComm, &cmo);
+
+		DCB dcb = { 0 };
+		dcb.DCBlength = sizeof(dcb);
+		done != 0 != GetCommState(hComm, &dcb);
+		dcb.fDtrControl = 1;
+		dcb.fRtsControl = 1;
+		done != 0 != SetCommState(hComm, &dcb);
 
 		if ((read_mcr(hComm)&0x3) ==0) {
 			write_mcr(hComm, true, true);
@@ -188,7 +195,7 @@ bool read_data(HANDLE hComm, unsigned char* pch)
 		if (ReadFile(hComm, pch, sizeof(*pch), &n, NULL) && n == sizeof(*pch)) {
 			return true;
 		}
-		else if (GetLastError() != ERROR_TIMEOUT) {
+		else if ((n =GetLastError()) == ERROR_TIMEOUT) {
 			return false;
 		}
 	}
@@ -196,7 +203,8 @@ bool read_data(HANDLE hComm, unsigned char* pch)
 }
 bool set_interrupt(HANDLE hComm) 
 {
-	return 	write_mcr(hComm, true, true);
+	//write_mcr(hComm, true, true);
+	return true;
 }
 /*
 *
