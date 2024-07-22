@@ -28,8 +28,8 @@
 #ifndef COM_PORT2
 #define COM_PORT2 0x2f8
 #endif
-unsigned int setup_tablet_at(unsigned short port, unsigned char as_emulation, unsigned char as_mouse);
 unsigned int setup_tablet(unsigned char choice, unsigned char as_emulation, unsigned char as_mouse);
+unsigned int setup_tablet_at(unsigned short port, unsigned char as_emulation, unsigned char as_mouse);
 unsigned char write_mcr(unsigned short port, unsigned char mode);
 unsigned char read_mcr(unsigned short port);
 unsigned char read_data_sp(unsigned short port, unsigned char* pch);
@@ -88,7 +88,7 @@ unsigned short get_tick_count()
 unsigned int setup_tablet_at(unsigned short port, unsigned char as_emulation, unsigned char as_mouse)
 {
 	int retries = 0;
-	char ch = 0;
+	unsigned char ch = 0;
 	unsigned char cmd = 0;
 	const char* message = 0;
 	if (!(read_mcr(port) & 3))
@@ -180,9 +180,6 @@ unsigned int setup_tablet_at(unsigned short port, unsigned char as_emulation, un
 	}
 	write_data(port, cmd);
 	goto _final;
-
-	//return FALSE;
-
 }
 unsigned int setup_tablet(unsigned char choice, unsigned char as_emulation, unsigned char as_mouse)
 {
@@ -207,15 +204,6 @@ unsigned int setup_tablet(unsigned char choice, unsigned char as_emulation, unsi
 	}
 	return FALSE;
 }
-unsigned char write_mcr(unsigned short port, unsigned char mode)
-{
-	__outbyte(port + 4, mode);
-	return mode;
-}
-unsigned char read_mcr(unsigned short port)
-{
-	return __inbyte(port + 4);
-}
 unsigned int delay_ms(unsigned int count)
 {
 	unsigned int target;
@@ -226,6 +214,15 @@ unsigned int delay_ms(unsigned int count)
 		current = get_tick_count();
 	while (current < target);
 	return current;
+}
+unsigned char read_mcr(unsigned short port)
+{
+	return __inbyte(port + 4);
+}
+unsigned char write_mcr(unsigned short port, unsigned char mode)
+{
+	__outbyte(port + 4, mode);
+	return mode;
 }
 unsigned char write_data(unsigned short port, unsigned char data)
 {

@@ -4,70 +4,17 @@
 static void delay_ms(DWORD count);
 static bool do_handshake(HANDLE hComm);
 static bool write_data(HANDLE hComm, unsigned char data);
-static bool read_data(HANDLE hComm, unsigned char* pdata);
+static bool read_data(HANDLE hComm, unsigned char* pch);
 static bool set_baud_rate(HANDLE hComm, unsigned char byte_size, unsigned char use_parity, unsigned char parity, unsigned short baud_rate);
-static int read_mcr(HANDLE hComm) {
+static DWORD  read_mcr(HANDLE hComm);
+static bool write_mcr(HANDLE hComm, bool dtr, bool rts);
+static bool set_interrupt(HANDLE hComm);
+static bool read_data_sp(HANDLE hComm, unsigned char* pch);
 
-	DWORD stat = 0;
-	BOOL done = GetCommModemStatus(hComm, &stat);
-	return done ? (((stat & MS_DSR_ON) != 0) << 1) | ((stat & MS_CTS_ON) != 0) 
-		:
-		0;
-}
-static bool write_mcr(HANDLE hComm,bool dtr,bool rts) {
-	// MCR 用来控制调制解调器的接口信号。
-	//	Bit0：设为1时，DTR脚位为LOW；设为0时，DTR脚位为HIGH。
-	//	Bit1：设为1时，RTS脚位为LOW；设为0时，RTS脚位为HIGH
-	//	Bit2，Bit3：用于控制芯片上的输出，新型芯片现已不用。
-	//	Bit4：：设为1时，芯片内部作自我诊断。
-	//	其他位永远为0
-	// 0000 1011
-	//	outportb(0x3fc, 0x0b);  //见上 
-	
-	BOOL done = TRUE;
-	if (dtr) {
-		done &= EscapeCommFunction(hComm, SETDTR);
-	}
-	else {
-		done &= EscapeCommFunction(hComm, CLRDTR);
-
-	}
-	if (rts) {
-		done &= EscapeCommFunction(hComm, SETRTS);
-	}
-	else {
-		done &= EscapeCommFunction(hComm, CLRRTS);
-
-	}
-	return done!=0;
-}
-static unsigned char read_data_sp(HANDLE hComm, unsigned char* pch)
-{
-	unsigned char result = 0;
-	unsigned char ch = 0;
-	read_data(hComm, &ch);
-	switch (ch) {
-	case 0x53:
-		ch = 0x06;
-		break;
-	case 0x2:
-	case 0x3:
-	case 0x4:
-	case 0x6:
-		break;
-	case 0x8:
-		result = 1;
-		break;
-	default:
-		break;
-	}
-	if (pch != 0)*pch = ch;
-	return result;
-}
-bool setup_tablet(LPCTSTR com_port, bool as_emulation, bool as_mouse)
+bool setup_tablet(LPCTSTR com_port, bool as_mouse, bool as_emulation)
 {
 	bool done = false;
-	unsigned char data = 0;
+	unsigned char ch = 0;
 	HANDLE hComm = CreateFile(
 		com_port,
 		GENERIC_READ | GENERIC_WRITE,
@@ -79,19 +26,30 @@ bool setup_tablet(LPCTSTR com_port, bool as_emulation, bool as_mouse)
 	);
 	if (hComm != INVALID_HANDLE_VALUE) {
 		//reset modem
-		if ((read_mcr(hComm)&0x3) !=0) {
+		COMMTIMEOUTS cmo = { 0 };
+		
+		GetCommTimeouts(hComm, &cmo);
+		cmo.ReadIntervalTimeout = 256;
+		SetCommTimeouts(hComm, &cmo);
+
+		if ((read_mcr(hComm)&0x3) ==0) {
 			write_mcr(hComm, true, true);
 			delay_ms(28);
 		}
 
-		done = do_handshake(hComm);
-		done = write_data(hComm, 0);
+		done &= do_handshake(hComm);
+		done &= set_interrupt(hComm);
+		done &= write_data(hComm, 0);
 		delay_ms(4);
 		done = write_data(hComm, 0x3F);
-
-		if (0 == read_data_sp(hComm, &data))
+		int retries = 0;
+		for (; retries < 256; retries++)
 		{
-			switch (data) {
+			write_data(hComm, 0x3F);
+			if (read_data_sp(hComm, &ch))break;
+		}
+		{
+			switch (ch) {
 			case 3:
 				write_data(hComm, as_mouse ? 0 : 0x4B);
 				done = true;
@@ -121,7 +79,7 @@ bool setup_tablet(LPCTSTR com_port, bool as_emulation, bool as_mouse)
 				done = true;
 				break;
 			default:
-				done = data == 2 || data == 8;
+				done = !(ch != 2 && ch != 8);
 				break;
 			}
 		}
@@ -133,18 +91,87 @@ bool setup_tablet(LPCTSTR com_port, bool as_emulation, bool as_mouse)
 void delay_ms(DWORD count) {
 	Sleep(count);
 }
+DWORD read_mcr(HANDLE hComm) {
+
+	DWORD stat = 0;
+	
+	BOOL done = GetCommModemStatus(hComm, &stat);
+
+	return done ? (((stat & MS_DSR_ON) != 0) << 1) | ((stat & MS_CTS_ON) != 0):~0;
+}
+bool write_mcr(HANDLE hComm, bool dtr, bool rts) {
+	// MCR 用来控制调制解调器的接口信号。
+	//	Bit0：设为1时，DTR脚位为LOW；设为0时，DTR脚位为HIGH。
+	//	Bit1：设为1时，RTS脚位为LOW；设为0时，RTS脚位为HIGH
+	//	Bit2，Bit3：用于控制芯片上的输出，新型芯片现已不用。
+	//	Bit4：：设为1时，芯片内部作自我诊断。
+	//	其他位永远为0
+	// 0000 1011
+	//	outportb(0x3fc, 0x0b);  //见上 
+
+	BOOL done = TRUE;
+	if (dtr) {
+		done &= EscapeCommFunction(hComm, SETDTR);
+	}
+	else {
+		done &= EscapeCommFunction(hComm, CLRDTR);
+
+	}
+	if (rts) {
+		done &= EscapeCommFunction(hComm, SETRTS);
+	}
+	else {
+		done &= EscapeCommFunction(hComm, CLRRTS);
+
+	}
+	return done != 0;
+}
 bool write_data(HANDLE hComm, unsigned char data)
 {
+	//read mcr first
 	read_mcr(hComm);
 	bool done = TransmitCommChar(hComm, data) != 0;
 	return done;
-//	DWORD n = 0;
-//	return WriteFile(hComm, &data,sizeof(data),&n,NULL) &&n==sizeof(data);
 }
-bool read_data(HANDLE hComm, unsigned char* pdata)
+bool read_data_sp(HANDLE hComm, unsigned char* pch)
+{
+	bool result = read_data(hComm, pch);
+	switch (*pch)
+	{
+	case 0x53:
+		*pch = 0x06;
+		break;
+	case 2:
+	case 3:
+	case 4:
+	case 6:
+
+		break;
+	case 8:
+		result = true;
+		break;
+	default:
+		result = false;
+		break;
+	}
+	return result;
+}
+bool read_data(HANDLE hComm, unsigned char* pch)
 {
 	DWORD n = 0;
-	return ReadFile(hComm, pdata, sizeof(*pdata), &n, NULL) && n == sizeof(*pdata);
+	for (int i = 0; i < 5; i++) {
+		if (ReadFile(hComm, pch, sizeof(*pch), &n, NULL) && n == sizeof(*pch)) {
+			return true;
+		}
+		else if (GetLastError() == ERROR_TIMEOUT) {
+			return false;
+		}
+	}
+	return false;
+}
+bool set_interrupt(HANDLE hComm) 
+{
+	return true;
 }
 /*
 *

@@ -21,15 +21,15 @@ class CAboutDlg : public CDialogEx
 public:
 	CAboutDlg();
 
-// 对话框数据
+	// 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_ABOUTBOX };
 #endif
 
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
-// 实现
+	// 实现
 protected:
 	DECLARE_MESSAGE_MAP()
 };
@@ -155,9 +155,7 @@ HCURSOR CSPTablet32Dlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-
-
 void CSPTablet32Dlg::OnBnClickedButtonTest()
 {
-	bool done = setup_tablet(_T("\\\\.\\COM2"),true,false);
+	bool done = setup_tablet(_T("\\\\.\\COM2"), true);
 }

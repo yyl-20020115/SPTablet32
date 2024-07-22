@@ -50,9 +50,6 @@
     <ClCompile Include="SPTablet32API.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="SPTabletDOS\SPTABLET.C">
-      <Filter>源文件</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SPTablet32.rc">
@@ -63,19 +60,13 @@
     <None Include="res\SPTablet32.rc2">
       <Filter>资源文件</Filter>
     </None>
-    <None Include="SPTablet32.old.asm">
-      <Filter>源文件</Filter>
-    </None>
     <None Include="comport.html">
-      <Filter>源文件</Filter>
-    </None>
-    <None Include="SPTablet32.cpp">
       <Filter>源文件</Filter>
     </None>
     <None Include="SPTabletDOS\SPTablet.asm">
       <Filter>源文件</Filter>
     </None>
-    <None Include="SPTabletDOS\SPTablet32.asm">
+    <None Include="SPTabletDOS\SPTABLET.C">
       <Filter>源文件</Filter>
     </None>
   </ItemGroup>
