@@ -10,10 +10,9 @@ static int read_mcr(HANDLE hComm) {
 
 	DWORD stat = 0;
 	BOOL done = GetCommModemStatus(hComm, &stat);
-	if (done) {
-		return (((stat & MS_DSR_ON) != 0) << 1) | ((stat & MS_CTS_ON) != 0);
-	}
-	return 0;
+	return done ? (((stat & MS_DSR_ON) != 0) << 1) | ((stat & MS_CTS_ON) != 0) 
+		:
+		0;
 }
 static bool write_mcr(HANDLE hComm,bool dtr,bool rts) {
 	// MCR 用来控制调制解调器的接口信号。
@@ -42,6 +41,29 @@ static bool write_mcr(HANDLE hComm,bool dtr,bool rts) {
 	}
 	return done!=0;
 }
+static unsigned char read_data_sp(HANDLE hComm, unsigned char* pch)
+{
+	unsigned char result = 0;
+	unsigned char ch = 0;
+	read_data(hComm, &ch);
+	switch (ch) {
+	case 0x53:
+		ch = 0x06;
+		break;
+	case 0x2:
+	case 0x3:
+	case 0x4:
+	case 0x6:
+		break;
+	case 0x8:
+		result = 1;
+		break;
+	default:
+		break;
+	}
+	if (pch != 0)*pch = ch;
+	return result;
+}
 bool setup_tablet(LPCTSTR com_port, bool as_emulation, bool as_mouse)
 {
 	bool done = false;
@@ -57,7 +79,7 @@ bool setup_tablet(LPCTSTR com_port, bool as_emulation, bool as_mouse)
 	);
 	if (hComm != INVALID_HANDLE_VALUE) {
 		//reset modem
-		if ((read_mcr(hComm)&0x3) == 0) {
+		if ((read_mcr(hComm)&0x3) !=0) {
 			write_mcr(hComm, true, true);
 			delay_ms(28);
 		}
@@ -66,7 +88,8 @@ bool setup_tablet(LPCTSTR com_port, bool as_emulation, bool as_mouse)
 		done = write_data(hComm, 0);
 		delay_ms(4);
 		done = write_data(hComm, 0x3F);
-		if (read_data(hComm, &data))
+
+		if (0 == read_data_sp(hComm, &data))
 		{
 			switch (data) {
 			case 3:
@@ -112,7 +135,9 @@ void delay_ms(DWORD count) {
 }
 bool write_data(HANDLE hComm, unsigned char data)
 {
-	return TransmitCommChar(hComm, data);
+	read_mcr(hComm);
+	bool done = TransmitCommChar(hComm, data) != 0;
+	return done;
 //	DWORD n = 0;
 //	return WriteFile(hComm, &data,sizeof(data),&n,NULL) &&n==sizeof(data);
 }

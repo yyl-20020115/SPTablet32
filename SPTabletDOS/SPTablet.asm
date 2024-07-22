@@ -7,7 +7,7 @@
 ; ===========================================================================
 
 ; Segment type: Pure code
-seg000          segment byte public 'CODE' use16
+seg000          segment
                 assume cs:seg000
                 org 100h
                 assume es:nothing, ss:nothing, ds:seg000;, fs:nothing, gs:nothing
@@ -140,12 +140,12 @@ loc_101A6:
                 nop
                 loopne  loc_101A6
                 cmp     choice, 0FFh
-                nop
-                jz      short loc_101C2
+                jnz     @do_next
                 jmp     loc_1028F
 ; ---------------------------------------------------------------------------
-
-loc_101C2:                              
+                align   16
+@do_next:
+                xor     ax,ax     
                 mov     choice, 0
                 nop
                 mov     di, 2F8h
@@ -737,7 +737,7 @@ skipws       endp
 
 
 parse_arguments       proc near               
-                mov     bx, word_10472
+                mov     bx, argumets_ptr
                 cmp     bx, 80h
                 jnz     short loc_10444
                 nop
@@ -786,7 +786,7 @@ loc_10460:
                 inc     bx
                 mov     al, [bx]
                 inc     bx
-                mov     word_10472, bx
+                mov     argumets_ptr, bx
                 xor     ah, ah
                 clc
                 retn
@@ -794,12 +794,12 @@ parse_arguments       endp
 
 do_out          proc
                 out  dx, al
-                call do_print_out
+                ;call do_print_out
                 ret
 do_out          endp
 do_in           proc
                 in      al, dx
-                call    do_print_in
+                ;call    do_print_in
                 ret
 do_in           endp
 
@@ -908,16 +908,16 @@ do_print_chex   proc ;al= byte to show
 do_print_chex   endp
 
 ; ---------------------------------------------------------------------------
-choice      db 0                    
+choice        db 0                    
                                         
-                db 10h
-port      dw 3F8h                 
+              db 10h
+port          dw 3F8h                 
                                         
 as_mouse      db 1                    
                                         
-as_emulation      db 0                    
+as_emulation  db 0                    
                                         
-word_10472      dw 80h                  
+argumets_ptr  dw 80h                  
                                         
 aParameterError db 'Parameter error!',0Dh,0Ah
                 db 'Use  /?, /1, /2 , /E or /M',7,7,0Dh,0Ah,'$'

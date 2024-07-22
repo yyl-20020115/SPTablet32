@@ -99,7 +99,7 @@ void start()
         v8 = v2;
         write_data(0x3Fu);
         v4 = read_data_sp();
-        if ( !v1 )
+        if ( !v1 ) //cf==0
         {
           if ( v4 == 4 )
           {
@@ -254,32 +254,32 @@ char read_data()
 {
   unsigned __int16 v0; // di
   unsigned __int16 v1; // dx
-  DWORD v2; // ebx
-  unsigned __int8 v3; // al
-  DWORD v4; // eax
+  DWORD start; // ebx
+  unsigned __int8 data; // al
+  DWORD current; // eax
   int v5; // ecx
-  bool v6; // zf
+  bool eq; // zf
   int v7; // ecx
 
   v0 = port;
-  v2 = GetTickCount();
+  start = GetTickCount();
   while ( 1 )
   {
-    v3 = __inbyte(v1);
-    if ( v3 & 1 )
+    data = __inbyte(v1);
+    if ( data & 1 )
       break;
-    v4 = GetTickCount();
-    v6 = v2 == v4;
-    if ( v2 != v4 )
+    current = GetTickCount();
+    eq = start == current;
+    if ( start != current )
     {
-      v2 = v4;
+      start = current;
       v7 = v5 - 1;
-      if ( !v6 || !v7 )
-        return v4;
+      if ( !eq || !v7 )
+        return current;
     }
   }
-  v4 = __inbyte(v0);
-  return v4;
+  current = __inbyte(v0);
+  return current;
 }
 // 404002: using guessed type int port;
 

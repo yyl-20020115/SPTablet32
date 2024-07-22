@@ -115,7 +115,7 @@ loc_101A6:
                 call    write_data
                 call    read_data_sp
                 pop     ecx
-                jnb     short loc_101D1
+                jnb     short loc_101D1 ;jump if clear carry bit: data is OK
                 nop
                 nop
                 nop
@@ -486,12 +486,12 @@ loc_10320:
 
 loc_10343:                              
                                         
-                clc
+                clc ;clear carry bit
                 retn
 ; ---------------------------------------------------------------------------
 
 loc_1036E_2:                              
-                stc
+                stc ;set carry bit
                 retn
 
 read_data_sp    endp          
@@ -519,10 +519,10 @@ loc_10358:
                 cmp     ebx, eax
                 jz      short loc_10358
                 mov     ebx, eax
-                loopne  loc_10358
+                loopne  loc_10358 ;zf==0 && cx!=0
 
 loc_1036E:                              
-                stc
+                stc ;set carry bit
                 retn
 ; ---------------------------------------------------------------------------
 
@@ -530,8 +530,8 @@ loc_10370:
                 xor     eax, eax
                 lea     edx, [edi]
                 in      al, dx
-                clc
-                retn
+                clc ;clear carry bit
+                retn 
 
 
 ; =============== S U B R O U T I N E =======================================

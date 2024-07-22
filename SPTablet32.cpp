@@ -10,7 +10,7 @@ static void set_baud_rate_factor(unsigned short port, unsigned char controls, un
 static void write_data(unsigned short port, unsigned char data);
 static unsigned char read_mcr(unsigned short port);
 static unsigned char read_lsr(unsigned short port);
-static unsigned char read_data_wrapper(unsigned short port,unsigned char* ret);
+static unsigned char read_data_sp(unsigned short port,unsigned char* ret);
 static unsigned char read_data(unsigned short port);
 static unsigned short get_baud_factor(unsigned int baud_rate);
 static unsigned short get_baud_rate(unsigned short baud_factor);
@@ -37,8 +37,8 @@ bool setup_tablet(unsigned short port, bool as_emulation, bool as_mouse)
 	delay_ms(4);
 
 	write_data(port, 0x3F);
-	data = read_data_wrapper(port,&ret);
-	if (data != 0)
+
+	if (0 == read_data_sp(port, &data))
 	{
 		switch (data) {
 		case 3:
@@ -127,30 +127,27 @@ unsigned char read_lsr(unsigned short port)
 	//´«ÊäÏß×´Ì¬¼Ä´æÆ÷
 	return __inbyte_impl(port + 5);
 }
-unsigned char read_data_wrapper(unsigned short port,unsigned char* pret)
+unsigned char read_data_sp(unsigned short port,unsigned char* pch)
 {
-	if(pret!=0) *pret = 0;
-	unsigned char result = read_data(port);
-	if (result == 0x53)
-		result = 0x06;
-	switch (result) {
+	unsigned char result = 0;
+	unsigned char ch = read_data(port);
+	switch (ch) {
 	case 0x53:
-		result = 0x06;
-		if (pret != 0) *pret = 0;
+		ch = 0x06;
 		break;
 	case 0x2:
 	case 0x3:
 	case 0x4:
 	case 0x6:
-		if (pret != 0) *pret = 0;
 		break;
 	case 0x8:
-		if (pret != 0) *pret = 1;
+		result = 1;
 		break;
 	default:
 		break;
 	}
-	return result;
+	if (pch != 0) *pch = 1;
+	return ch;
 }
 
 unsigned char read_data(unsigned short port)

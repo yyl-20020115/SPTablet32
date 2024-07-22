@@ -159,5 +159,5 @@ HCURSOR CSPTablet32Dlg::OnQueryDragIcon()
 
 void CSPTablet32Dlg::OnBnClickedButtonTest()
 {
-	bool done = setup_tablet(_T("\\\\.\\COM3"));
+	bool done = setup_tablet(_T("\\\\.\\COM2"),true,false);
 }

@@ -33,9 +33,6 @@
     <ClInclude Include="pch.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="SPTablet32.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="SPTablet32API.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -51,6 +48,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="SPTablet32API.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SPTabletDOS\SPTABLET.C">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -76,9 +76,6 @@
       <Filter>源文件</Filter>
     </None>
     <None Include="SPTabletDOS\SPTablet32.asm">
-      <Filter>源文件</Filter>
-    </None>
-    <None Include="SPTabletDOS\SPTablet32.c">
       <Filter>源文件</Filter>
     </None>
   </ItemGroup>
