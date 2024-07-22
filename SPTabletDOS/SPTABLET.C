@@ -28,8 +28,8 @@
 #ifndef COM_PORT2
 #define COM_PORT2 0x2f8
 #endif
-unsigned int setup_tablet(unsigned char choice, unsigned char as_emulation, unsigned char as_mouse);
-unsigned int setup_tablet_at(unsigned short port, unsigned char as_emulation, unsigned char as_mouse);
+unsigned int setup_tablet(unsigned char choice, unsigned char as_emulation, unsigned char mouse_type);
+unsigned int setup_tablet_at(unsigned short port, unsigned char as_emulation, unsigned char mouse_type);
 unsigned char write_mcr(unsigned short port, unsigned char mode);
 unsigned char read_mcr(unsigned short port);
 unsigned char read_data_sp(unsigned short port, unsigned char* pch);
@@ -85,10 +85,10 @@ unsigned short get_tick_count()
 	return peek(0, TICK_COUNT_PTR);
 }
 #endif
-unsigned int setup_tablet_at(unsigned short port, unsigned char as_emulation, unsigned char as_mouse)
+unsigned int setup_tablet_at(unsigned short port, unsigned char as_emulation, unsigned char mouse_type)
 {
 	int retries = 0;
-	unsigned char ch = 0;
+	unsigned char ch = 0xff;
 	unsigned char cmd = 0;
 	const char* message = 0;
 	if (!(read_mcr(port) & 3))
@@ -115,7 +115,11 @@ unsigned int setup_tablet_at(unsigned short port, unsigned char as_emulation, un
 	}
 	else if (ch == 4)
 	{
-		if (as_mouse)
+		if (mouse_type == 0)
+		{
+			cmd = 0x4B;
+		}
+		else
 		{
 			if (as_emulation)
 			{
@@ -128,17 +132,10 @@ unsigned int setup_tablet_at(unsigned short port, unsigned char as_emulation, un
 				cmd = 0x6F;
 			}
 		}
-		else
-		{
-			cmd = 0x4B;
-		}
 	}
 	else if (ch == 3)
 	{
-		if (as_mouse)
-			cmd = 0;
-		else
-			cmd = 0x4B;
+		cmd = mouse_type == 0 ? 0x4B : 0;
 	}
 	else
 	{
@@ -151,7 +148,7 @@ unsigned int setup_tablet_at(unsigned short port, unsigned char as_emulation, un
 				return FALSE;
 			}
 		_final:
-			if (as_mouse == 1)
+			if (mouse_type == 1)
 			{
 				printf("%s", aSetTabletModeOK);
 				if (port == COM_PORT1)
@@ -166,29 +163,19 @@ unsigned int setup_tablet_at(unsigned short port, unsigned char as_emulation, un
 			printf("%s", message);
 			return TRUE;
 		}
-		if (as_mouse)
-		{
-			if (as_emulation)
-				cmd = 0x5A;
-			else
-				cmd = 0x6F;
-		}
-		else
-		{
-			cmd = 0x4B;
-		}
+		cmd = mouse_type == 0 ? 0x4B : (as_emulation ? 0x5A : 0x6F);
 	}
 	write_data(port, cmd);
 	goto _final;
 }
-unsigned int setup_tablet(unsigned char choice, unsigned char as_emulation, unsigned char as_mouse)
+unsigned int setup_tablet(unsigned char choice, unsigned char as_emulation, unsigned char mouse_type)
 {
 	switch (choice)
 	{
 	case 0:
-		if (!setup_tablet_at(COM_PORT1, as_emulation, as_mouse))
+		if (!setup_tablet_at(COM_PORT1, as_emulation, mouse_type))
 		{
-			if (!setup_tablet_at(COM_PORT2, as_emulation, as_mouse))
+			if (!setup_tablet_at(COM_PORT2, as_emulation, mouse_type))
 			{
 				return FALSE;
 			}
@@ -198,9 +185,9 @@ unsigned int setup_tablet(unsigned char choice, unsigned char as_emulation, unsi
 			return TRUE;
 		}
 	case 1:
-		return setup_tablet_at(COM_PORT1, as_emulation, as_mouse);
+		return setup_tablet_at(COM_PORT1, as_emulation, mouse_type);
 	case 2:
-		return setup_tablet_at(COM_PORT2, as_emulation, as_mouse);
+		return setup_tablet_at(COM_PORT2, as_emulation, mouse_type);
 	}
 	return FALSE;
 }
@@ -283,14 +270,14 @@ unsigned char set_interrupt(unsigned short port)
 {
 	unsigned char val;
 	set_baud_rate(port, 0xB, 12);
-	val = __inbyte(0x21);
+	val = __inbyte(0x21); //READ IMR
 	if (port == COM_PORT2)
-		val &= 0xF7;
+		val &= 0xF7; //IRQ3
 	else
-		val &= 0xEF;
-	__outbyte(0x21, val);
-	__outbyte(port + 4, 0xB);
-	__outbyte(port + 1, 0x1);
+		val &= 0xEF; //IRQ4
+	__outbyte(0x21, val);//0:Enable,1:Disable
+	__outbyte(port + 4, 0xB);//MCR
+	__outbyte(port + 1, 0x1);//IER: Enable Interrupt
 	return val;
 }
 unsigned char set_baud_rate(unsigned short port, unsigned char mode, unsigned short baud_factor)
@@ -316,7 +303,7 @@ unsigned char do_handshake(unsigned short port)
 int main(int argc, char* argv[])
 {
 	int i = 0;
-	unsigned char choice = 0, as_emulation = 0, as_mouse = 1;
+	unsigned char choice = 0, as_emulation = 0, mouse_type = 1;
 #ifndef _WIN32
 	_AX = 0x160A;
 	geninterrupt(0x2f);
@@ -344,7 +331,7 @@ int main(int argc, char* argv[])
 			}
 			else if (0 == stricmp(argv[i], "/M"))
 			{
-				as_mouse = 1;
+				mouse_type = 0;
 			}
 			else {
 				printf(aParameterError);
@@ -352,7 +339,7 @@ int main(int argc, char* argv[])
 			}
 		}
 		printf("SPTABLET\r\n");
-		return !setup_tablet(choice, as_emulation, as_mouse);
+		return !setup_tablet(choice, as_emulation, mouse_type);
 	}
 #ifndef _WIN32
 	else {

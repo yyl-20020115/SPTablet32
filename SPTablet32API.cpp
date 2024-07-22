@@ -11,8 +11,10 @@ static bool write_mcr(HANDLE hComm, bool dtr, bool rts);
 static bool set_interrupt(HANDLE hComm);
 static bool read_data_sp(HANDLE hComm, unsigned char* pch);
 
-bool setup_tablet(LPCTSTR com_port, bool as_mouse, bool as_emulation)
+
+tablet_status setup_tablet(LPCTSTR com_port, mouse_protocol mouse_type, bool as_emulation)
 {
+	tablet_status status = unknown;
 	bool done = false;
 	unsigned char ch = 0;
 	HANDLE hComm = CreateFile(
@@ -25,6 +27,7 @@ bool setup_tablet(LPCTSTR com_port, bool as_mouse, bool as_emulation)
 		NULL
 	);
 	if (hComm != INVALID_HANDLE_VALUE) {
+		done = true;
 		//reset modem
 		COMMTIMEOUTS cmo = { 0 };
 		
@@ -48,14 +51,19 @@ bool setup_tablet(LPCTSTR com_port, bool as_mouse, bool as_emulation)
 			write_data(hComm, 0x3F);
 			if (read_data_sp(hComm, &ch))break;
 		}
+		if (retries == 256) {
+			status = not_responding;
+			done = false;
+		}
+		if(done)
 		{
 			switch (ch) {
 			case 3:
-				write_data(hComm, as_mouse ? 0 : 0x4B);
+				write_data(hComm, mouse_type == mouse_system_protocol ?  0x4B :0);
 				done = true;
 				break;
 			case 4:
-				if (!as_mouse)
+				if (mouse_type == mouse_system_protocol)
 				{
 					write_data(hComm, 0x4B);
 				}
@@ -75,18 +83,31 @@ bool setup_tablet(LPCTSTR com_port, bool as_mouse, bool as_emulation)
 				done = true;
 				break;
 			case 6:
-				write_data(hComm, as_mouse ? (as_emulation ? 0x5A : 0x6F) : 0x4B);
+				write_data(hComm, mouse_type == mouse_system_protocol ? 0x4B : (as_emulation ? 0x5A : 0x6F));
 				done = true;
 				break;
 			default:
-				done = !(ch != 2 && ch != 8);
+				if (ch != 2 && ch != 8) {
+					status = not_sp_tablet;
+					done = false;
+				}
+				else {
+					done = true;
+				}
 				break;
 			}
 		}
 		CloseHandle(hComm);
 	}
 
-	return done;
+	if (done) {
+		status = mouse_type == mouse_system_protocol ? reset_tablet_ok : set_tablet_mode_ok;
+	}
+	else {
+		//not_responding
+		//not_sp_tablet
+	}
+	return status;
 }
 void delay_ms(DWORD count) {
 	Sleep(count);
@@ -111,16 +132,20 @@ bool write_mcr(HANDLE hComm, bool dtr, bool rts) {
 
 	BOOL done = TRUE;
 	if (dtr) {
+		//1=LOW
 		done &= EscapeCommFunction(hComm, SETDTR);
 	}
 	else {
+		//0=HIGH
 		done &= EscapeCommFunction(hComm, CLRDTR);
 
 	}
 	if (rts) {
+		//0=HIGH
 		done &= EscapeCommFunction(hComm, SETRTS);
 	}
 	else {
+		//1=LOW
 		done &= EscapeCommFunction(hComm, CLRRTS);
 
 	}
@@ -163,7 +188,7 @@ bool read_data(HANDLE hComm, unsigned char* pch)
 		if (ReadFile(hComm, pch, sizeof(*pch), &n, NULL) && n == sizeof(*pch)) {
 			return true;
 		}
-		else if (GetLastError() == ERROR_TIMEOUT) {
+		else if (GetLastError() != ERROR_TIMEOUT) {
 			return false;
 		}
 	}
@@ -171,7 +196,7 @@ bool read_data(HANDLE hComm, unsigned char* pch)
 }
 bool set_interrupt(HANDLE hComm) 
 {
-	return true;
+	return 	write_mcr(hComm, true, true);
 }
 /*
 *

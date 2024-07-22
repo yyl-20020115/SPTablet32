@@ -41,18 +41,18 @@ start           proc near
 
 @main_loop:                                                                      
                 call    parse_arguments
-                jnb     short loc_10130
+                jnb     short loc_10130 ;if carry is set,
                 nop
                 nop
                 nop
                 cmp     ax, 0FFFFh
-                jnz     short loc_1017F
+                jnz     short loc_1017F ; if not finished
                 nop
                 nop
                 nop
 
 loc_1012D:                              
-                jmp     loc_102A0
+                jmp     loc_102A0 ; parameter error 
 ; ---------------------------------------------------------------------------
 
 loc_10130:                              
@@ -96,13 +96,13 @@ loc_10169:
                 nop
                 nop
                 nop
-                jmp     loc_102A5
+                jmp     loc_102A5 ; call help
 ; ---------------------------------------------------------------------------
 
 loc_10173:                              
                 cmp     al, 'M'
                 jnz     short loc_1012D
-                mov     as_mouse, 0
+                mov     as_mouse, 0; 0 means Mouse System Mouse
                 nop
                 jmp     short @main_loop
 ; ---------------------------------------------------------------------------
@@ -325,7 +325,7 @@ loc_1029B:
 ; ---------------------------------------------------------------------------
 
 loc_102A0:                              
-                mov     dx, offset aParameterError
+                mov     dx, offset aParameterError 
                 jmp     short loc_10292
 ; ---------------------------------------------------------------------------
 
@@ -700,30 +700,30 @@ do_handshake       endp
 
 skipws       proc near               
                                         
-                mov     al, [bx]
-                cmp     al, 0Dh
+                mov     al, [bx] ;get char
+                cmp     al, '\r'
                 jnz     short loc_10415
                 nop
                 nop
                 nop
-                xor     al, al
+                xor     al, al ;clear al, and return
                 jmp     short locret_10426
 ; ---------------------------------------------------------------------------
                 nop
 ; ---------------------------------------------------------------------------
 
 loc_10415:                              
-                cmp     al, 0
-                jz      short locret_10426
+                cmp     al, 0 ;not '\r'
+                jz      short locret_10426 ;if NULL, return
                 nop
                 nop
                 nop
-                cmp     al, 20h
-                jnz     short locret_10426
+                cmp     al, ' '
+                jnz     short locret_10426 ;if not ' ' return
                 nop
                 nop
                 nop
-                inc     bx
+                inc     bx  ; next
                 jmp     short skipws
 ; ---------------------------------------------------------------------------
 
@@ -743,12 +743,13 @@ parse_arguments       proc near
                 nop
                 nop
                 nop
+;starting
                 cmp     byte ptr [bx], 0
-                jz      short @quit_searching
+                jz      short @quit_searching ; if no args found
                 nop
                 nop
                 nop
-                inc     bx
+                inc     bx ;pointer++
                 jmp     short loc_10444
 ; ---------------------------------------------------------------------------
                 nop
@@ -760,16 +761,16 @@ parse_arguments       proc near
                 retn
 ; ---------------------------------------------------------------------------
 
-loc_10444:                              
+loc_10444:      ;for args                       
                                         
                 call    skipws
                 mov     al, [bx]
-                cmp     al, 2Dh
+                cmp     al, '-'
                 jz      short loc_10460
                 nop
                 nop
                 nop
-                cmp     al, 2Fh
+                cmp     al, '/'
                 jz      short loc_10460
                 nop
                 nop
@@ -777,7 +778,7 @@ loc_10444:
                 cmp     al, 0Dh
                 jz      short @quit_searching
                 mov     ax, 0FFFFh
-                stc
+                stc     ;ax = -1 carry set
                 retn
 ; ---------------------------------------------------------------------------
 

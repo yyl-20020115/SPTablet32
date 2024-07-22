@@ -157,5 +157,8 @@ HCURSOR CSPTablet32Dlg::OnQueryDragIcon()
 
 void CSPTablet32Dlg::OnBnClickedButtonTest()
 {
-	bool done = setup_tablet(_T("\\\\.\\COM2"), true);
+	tablet_status status = setup_tablet(_T("\\\\.\\COM2"), mouse_system_protocol);
+	if (status > 0) {
+
+	}
 }
