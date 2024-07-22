@@ -93,6 +93,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -116,6 +117,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -141,6 +143,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -168,6 +171,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -187,6 +191,22 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CSerialPort\ibuffer.hpp" />
+    <ClInclude Include="CSerialPort\ilog.hpp" />
+    <ClInclude Include="CSerialPort\ithread.hpp" />
+    <ClInclude Include="CSerialPort\itimer.hpp" />
+    <ClInclude Include="CSerialPort\iutils.hpp" />
+    <ClInclude Include="CSerialPort\SerialPort.h" />
+    <ClInclude Include="CSerialPort\SerialPortBase.h" />
+    <ClInclude Include="CSerialPort\SerialPortInfo.h" />
+    <ClInclude Include="CSerialPort\SerialPortInfoBase.h" />
+    <ClInclude Include="CSerialPort\SerialPortInfoUnixBase.h" />
+    <ClInclude Include="CSerialPort\SerialPortInfoWinBase.h" />
+    <ClInclude Include="CSerialPort\SerialPortListener.h" />
+    <ClInclude Include="CSerialPort\SerialPortUnixBase.h" />
+    <ClInclude Include="CSerialPort\SerialPortWinBase.h" />
+    <ClInclude Include="CSerialPort\SerialPort_global.h" />
+    <ClInclude Include="CSerialPort\SerialPort_version.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
@@ -196,6 +216,12 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CSerialPort\SerialPort.cpp" />
+    <ClCompile Include="CSerialPort\SerialPortBase.cpp" />
+    <ClCompile Include="CSerialPort\SerialPortInfo.cpp" />
+    <ClCompile Include="CSerialPort\SerialPortInfoBase.cpp" />
+    <ClCompile Include="CSerialPort\SerialPortInfoWinBase.cpp" />
+    <ClCompile Include="CSerialPort\SerialPortWinBase.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

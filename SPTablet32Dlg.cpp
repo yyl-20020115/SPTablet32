@@ -8,7 +8,6 @@
 #include "SPTablet32Dlg.h"
 #include "afxdialogex.h"
 #include "SPTablet32API.h"
-
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -53,6 +52,8 @@ END_MESSAGE_MAP()
 
 CSPTablet32Dlg::CSPTablet32Dlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_SPTABLET32_DIALOG, pParent)
+	, Port()
+	, Buffer()
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -60,13 +61,108 @@ CSPTablet32Dlg::CSPTablet32Dlg(CWnd* pParent /*=nullptr*/)
 void CSPTablet32Dlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_COMBO_PORTS_LIST, PortsList);
+}
+
+void CSPTablet32Dlg::onReadEvent(const char* portName, unsigned int readBufferLen)
+{
+	if (this->Port.isOpen() && readBufferLen > 0)
+	{
+		unsigned char* data = new unsigned char[readBufferLen];
+
+		if (data != nullptr)
+		{
+			int recLen = this->Port.readData(data, readBufferLen);
+			if (recLen > 0) {
+				size_t parts = this->Buffer.size() / PacketLength;
+				size_t reminder = this->Buffer.size() % PacketLength;
+				if (reminder == 0) {
+					this->Buffer.clear();
+				}
+				else {
+					std::vector<unsigned char> NewBuffer(this->Buffer.begin() + parts * PacketLength, this->Buffer.end());
+					this->Buffer = NewBuffer;
+				}
+				this->Buffer.insert(this->Buffer.end(), data, data + recLen);
+				this->onProcessPackets(this->Buffer);
+
+			}
+
+			delete[] data;
+		}
+	}
+}
+
+void CSPTablet32Dlg::onProcessPackets(const std::vector<unsigned char>& Buffer)
+{
+	size_t _bmax = Buffer.size();
+	size_t _count = _bmax / PacketLength;
+	size_t _reminder = _bmax % PacketLength;
+
+	if (_reminder > 0) {
+		_bmax -= _reminder;
+	}
+	UINT ret = 0;
+	INPUT* inputs = new INPUT[_count];
+	if (inputs != nullptr) {
+		for (size_t i = 0; i < _bmax; i += PacketLength) {
+			unsigned char btx = Buffer[i + 0];
+			unsigned char bx0 = Buffer[i + 1];
+			unsigned char by0 = Buffer[i + 2];
+			unsigned char bx1 = Buffer[i + 3];
+			unsigned char by1 = Buffer[i + 4];
+
+			bool left = (btx & 0b00000100) != 0;
+			bool middle = (btx & 0b00000010) != 0;
+			bool right = (btx & 0b00000001) != 0;
+
+			int dx = ((int)bx0) | ((int)bx1) << 8;
+			int dy = ((int)by0) | ((int)by1) << 8;
+
+			inputs[i].type = INPUT_MOUSE;
+			inputs[0].mi.mouseData = 0;
+
+			if (dx != last_x || dy != last_y) {
+				inputs[i].mi.dwFlags |= MOUSEEVENTF_MOVE;
+			}
+
+			if (!last_left && left)
+				inputs[i].mi.dwFlags |= MOUSEEVENTF_LEFTDOWN;
+			else if (last_left && !left)
+				inputs[i].mi.dwFlags |= MOUSEEVENTF_LEFTUP;
+			last_left = left;
+
+
+			if (!last_middle && middle)
+				inputs[i].mi.dwFlags |= MOUSEEVENTF_MIDDLEDOWN;
+			else if (last_middle && !middle)
+				inputs[i].mi.dwFlags |= MOUSEEVENTF_MIDDLEUP;
+			last_middle = middle;
+			if (!last_right && right)
+				inputs[i].mi.dwFlags |= MOUSEEVENTF_RIGHTDOWN;
+			else if (last_right && !right)
+				inputs[i].mi.dwFlags |= MOUSEEVENTF_RIGHTUP;
+			last_right = right;
+
+			inputs[i].mi.dx = dx;
+			inputs[i].mi.dy = dy;
+
+		}
+
+		ret = SendInput(_count, inputs, sizeof(INPUT));
+
+		delete[] inputs;
+
+
+	}
+
 }
 
 BEGIN_MESSAGE_MAP(CSPTablet32Dlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_BN_CLICKED(IDC_BUTTON_TEST, &CSPTablet32Dlg::OnBnClickedButtonTest)
+	ON_BN_CLICKED(IDC_BUTTON_TEST, &CSPTablet32Dlg::OnBnClickedButtonStart)
 END_MESSAGE_MAP()
 
 
@@ -155,10 +251,29 @@ HCURSOR CSPTablet32Dlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-void CSPTablet32Dlg::OnBnClickedButtonTest()
+void CSPTablet32Dlg::OnBnClickedButtonStart()
 {
-	tablet_status status = setup_tablet(_T("\\\\.\\COM2"), mouse_system_protocol);
+	CString COM = _T("COM2");
+	CString COMPath = _T("\\\\.\\") + COM;
+
+	tablet_status status = setup_tablet(COMPath, mouse_system_protocol);
 	if (status > 0) {
+		if (this->Port.isOpen()) {
+			this->Port.close();
+			this->Port.disconnectReadEvent();
+		}
+		this->Port.connectReadEvent(this);
+		//this->Port.setReadIntervalTimeout(5);
+		this->Port.init(
+			(CStringA)COM,
+			9600,
+			itas109::Parity(itas109::Parity::ParityOdd),
+			itas109::DataBits(itas109::DataBits::DataBits8),
+			itas109::StopBits(itas109::StopBits::StopOne));
+		if (this->Port.open())
+		{
+			this->PortsList.EnableWindow(FALSE);
+		}
 
 	}
 }
