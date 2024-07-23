@@ -164,9 +164,6 @@ size_t CSPTablet32Dlg::onProcessPacket(const char* buffer, size_t length)
 			&& (by & 0b11000000) == 0b10000000
 			)
 		{
-			//empty frame
-			if (bx == (char)0x80 && by == (char)0x80) return i;
-
 			bool left =  (bc & 0b00100000) != 0;
 			bool right = (bc & 0b00010000) != 0;
 
