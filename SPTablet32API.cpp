@@ -32,7 +32,7 @@ tablet_status setup_tablet(LPCTSTR com_port, mouse_protocol mouse_type, bool as_
 		COMMTIMEOUTS cmo = { 0 };
 		
 		done &= 0!=GetCommTimeouts(hComm, &cmo);
-		cmo.ReadTotalTimeoutConstant = 256;
+		cmo.ReadTotalTimeoutConstant = 2;
 		done &= 0!=SetCommTimeouts(hComm, &cmo);
 
 		DCB dcb = { 0 };
@@ -42,7 +42,9 @@ tablet_status setup_tablet(LPCTSTR com_port, mouse_protocol mouse_type, bool as_
 		dcb.fRtsControl = 1;
 		done != 0 != SetCommState(hComm, &dcb);
 
-		if ((read_mcr(hComm)&0x3) ==0) {
+		//if ((read_mcr(hComm)&0x3) ==0)
+		//force reset tablet
+		{
 			write_mcr(hComm, true, true);
 			delay_ms(28);
 		}
@@ -66,11 +68,11 @@ tablet_status setup_tablet(LPCTSTR com_port, mouse_protocol mouse_type, bool as_
 		{
 			switch (ch) {
 			case 3:
-				write_data(hComm, mouse_type == mouse_system_protocol ?  0x4B :0);
+				write_data(hComm, mouse_type == microsoft_mouse_protocol ?  0x4B :0);
 				done = true;
 				break;
 			case 4:
-				if (mouse_type == mouse_system_protocol)
+				if (mouse_type == microsoft_mouse_protocol)
 				{
 					write_data(hComm, 0x4B);
 				}
@@ -90,7 +92,7 @@ tablet_status setup_tablet(LPCTSTR com_port, mouse_protocol mouse_type, bool as_
 				done = true;
 				break;
 			case 6:
-				write_data(hComm, mouse_type == mouse_system_protocol ? 0x4B : (as_emulation ? 0x5A : 0x6F));
+				write_data(hComm, mouse_type == microsoft_mouse_protocol ? 0x4B : (as_emulation ? 0x5A : 0x6F));
 				done = true;
 				break;
 			default:
@@ -108,7 +110,7 @@ tablet_status setup_tablet(LPCTSTR com_port, mouse_protocol mouse_type, bool as_
 	}
 
 	if (done) {
-		status = mouse_type == mouse_system_protocol ? reset_tablet_ok : set_tablet_mode_ok;
+		status = mouse_type == microsoft_mouse_protocol ? reset_tablet_ok : set_tablet_mode_ok;
 	}
 	else {
 		//not_responding
@@ -195,16 +197,14 @@ bool read_data(HANDLE hComm, unsigned char* pch)
 		if (ReadFile(hComm, pch, sizeof(*pch), &n, NULL) && n == sizeof(*pch)) {
 			return true;
 		}
-		else if ((n =GetLastError()) == ERROR_TIMEOUT) {
-			return false;
-		}
 	}
 	return false;
 }
 bool set_interrupt(HANDLE hComm) 
 {
-	//write_mcr(hComm, true, true);
-	return true;
+	bool done = set_baud_rate(hComm, 8, 1, 0, 9600); //1011,9600
+	done &= write_mcr(hComm, true, true);
+	return done;
 }
 /*
 *

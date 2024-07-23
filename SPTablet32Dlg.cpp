@@ -74,23 +74,21 @@ void CSPTablet32Dlg::onReadEvent(const char* portName, unsigned int readBufferLe
 		{
 			int recLen = this->Port.readData(data, readBufferLen);
 			if (recLen > 0) {
+				CString all;
 				for (int i = 0; i < recLen; i++) {
 					CString text;
-					text.Format(_T("%02X\r\n"), data[i]);
-					OutputDebugString(text);
+					text.Format(_T("%02X "), data[i]);
+					all += text;
 				}
-				size_t parts = this->Buffer.size() / PacketLength;
-				size_t reminder = this->Buffer.size() % PacketLength;
-				if (reminder == 0 && parts>0) {
-					this->Buffer.clear();
-				}
-				else {
-					std::vector<unsigned char> NewBuffer(this->Buffer.begin() + parts * PacketLength, this->Buffer.end());
-					this->Buffer = NewBuffer;
-				}
-				this->Buffer.insert(this->Buffer.end(), data, data + recLen);
-				this->onProcessPackets(this->Buffer);
+				OutputDebugString(all + _T("\r\n"));
 
+				this->Buffer += (char*)data;
+				unsigned int shift = 0;
+				//while (this->Buffer.size() >= 2 * PacketLength) {
+				//	auto part = this->Buffer.substr(0, PacketLength);
+				//	//this->onProcessPacket(part,shift);
+				//	this->Buffer = this->Buffer.substr(shift + PacketLength);
+				//}
 			}
 
 			delete[] data;
@@ -98,69 +96,72 @@ void CSPTablet32Dlg::onReadEvent(const char* portName, unsigned int readBufferLe
 	}
 }
 
-void CSPTablet32Dlg::onProcessPackets(const std::vector<unsigned char>& Buffer)
+void CSPTablet32Dlg::onProcessPacket(const std::basic_string<unsigned char>& Buffer, unsigned int& shift)
 {
-	size_t _bmax = Buffer.size();
-	size_t _count = _bmax / PacketLength;
-	size_t _reminder = _bmax % PacketLength;
-	if (_count == 0) return;
-	if (_reminder > 0) {
-		_bmax -= _reminder;
-	}
-	
+	//mouse system mouse protocol :
+	//BYTE 0   1  0  0  0  0  L  M  R     80
+	//BYTE 1   X7 X6 X5 X4 X3 X2 X1 X0    80
+	//BYTE 2   Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0    00
+	//BYTE 3   X7 X6 X5 X4 X3 X2 X1 X0    E0
+	//BYTE 4   Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0    80
+
+	//microsoft mouse protocol :
+	//BYTE 0   1  1  L  R  Y7 Y6 X7 X6
+	//BYTE 1   0  0  X5 X4 X3 X2 X1 X0
+	//BYTE 2   0  0  Y5 Y4 Y3 Y2 Y1 Y0
+
 	UINT ret = 0;
-	INPUT* inputs = new INPUT[_count];
-	if (inputs != nullptr) {
-		for (size_t i = 0; i < _bmax; i += PacketLength) {
-			unsigned char btx = Buffer[i + 0];
-			unsigned char bx0 = Buffer[i + 1];
-			unsigned char by0 = Buffer[i + 2];
-			unsigned char bx1 = Buffer[i + 3];
-			unsigned char by1 = Buffer[i + 4];
+	INPUT input = { 0 };
 
-			bool left = (btx & 0b00000100) != 0;
-			bool middle = (btx & 0b00000010) != 0;
-			bool right = (btx & 0b00000001) != 0;
-
-			int dx = ((int)bx0) | ((int)bx1) << 8;
-			int dy = ((int)by0) | ((int)by1) << 8;
-
-			inputs[i].type = INPUT_MOUSE;
-			inputs[0].mi.mouseData = 0;
-
-			if (dx != last_x || dy != last_y) {
-				inputs[i].mi.dwFlags |= MOUSEEVENTF_MOVE;
-			}
-
-			if (!last_left && left)
-				inputs[i].mi.dwFlags |= MOUSEEVENTF_LEFTDOWN;
-			else if (last_left && !left)
-				inputs[i].mi.dwFlags |= MOUSEEVENTF_LEFTUP;
-			last_left = left;
-
-
-			if (!last_middle && middle)
-				inputs[i].mi.dwFlags |= MOUSEEVENTF_MIDDLEDOWN;
-			else if (last_middle && !middle)
-				inputs[i].mi.dwFlags |= MOUSEEVENTF_MIDDLEUP;
-			last_middle = middle;
-			if (!last_right && right)
-				inputs[i].mi.dwFlags |= MOUSEEVENTF_RIGHTDOWN;
-			else if (last_right && !right)
-				inputs[i].mi.dwFlags |= MOUSEEVENTF_RIGHTUP;
-			last_right = right;
-
-			inputs[i].mi.dx = dx;
-			inputs[i].mi.dy = dy;
-
+	size_t i = 0;
+	for(i = 0;i<3;i++)
+	{
+		//found header
+		if ((Buffer[i] & 0b11000000) == 0b11000000) {
+			break;
 		}
-
-		ret = SendInput(_count, inputs, sizeof(INPUT));
-
-		delete[] inputs;
-
-
+		shift++;
 	}
+	unsigned char bc = Buffer[i + 0];
+	unsigned char bx = Buffer[i + 1];
+	unsigned char by = Buffer[i + 2];
+
+	bool left =  (bc & 0b00100000) != 0;
+	bool middle = false;// (btx & 0b00000010) != 0;
+	bool right = (bc & 0b00010000) != 0;
+
+	int dx = bx | (bc & 0b00000011) << 6;
+	int dy = by | (bc & 0b00001100) << 4;
+
+	input.type = INPUT_MOUSE;
+	input.mi.mouseData = 0;
+
+	if (dx != last_x || dy != last_y) {
+		input.mi.dwFlags |= MOUSEEVENTF_MOVE| MOUSEEVENTF_ABSOLUTE;
+	}
+
+	if (!last_left && left)
+		input.mi.dwFlags |= MOUSEEVENTF_LEFTDOWN;
+	else if (last_left && !left)
+		input.mi.dwFlags |= MOUSEEVENTF_LEFTUP;
+	last_left = left;
+
+
+	if (!last_middle && middle)
+		input.mi.dwFlags |= MOUSEEVENTF_MIDDLEDOWN;
+	else if (last_middle && !middle)
+		input.mi.dwFlags |= MOUSEEVENTF_MIDDLEUP;
+	last_middle = middle;
+	if (!last_right && right)
+		input.mi.dwFlags |= MOUSEEVENTF_RIGHTDOWN;
+	else if (last_right && !right)
+		input.mi.dwFlags |= MOUSEEVENTF_RIGHTUP;
+	last_right = right;
+
+	input.mi.dx = dx;
+	input.mi.dy = dy;
+
+	ret = SendInput(1, &input, sizeof(INPUT));
 
 }
 
@@ -262,23 +263,28 @@ void CSPTablet32Dlg::OnBnClickedButtonStart()
 	CString COM = _T("COM2");
 	CString COMPath = _T("\\\\.\\") + COM;
 
-	tablet_status status = setup_tablet(COMPath, mouse_system_protocol);
-	if (status > 0) 
+	tablet_status status = setup_tablet(COMPath, microsoft_mouse_protocol);
+	if (status > 0) {
+		MessageBox(_T("SPTablet is initialized as a mouse!"), _T("SPTablet"));
+	}
+	else {
+		MessageBox(_T("SPTablet is NOT initialized as a mouse!"), _T("SPTablet"));
+	}
+	if (status > 0)
 	{
 		if (this->Port.isOpen()) {
 			this->Port.close();
 			this->Port.disconnectReadEvent();
 		}
 		this->Port.connectReadEvent(this);
-		//this->Port.setReadIntervalTimeout(5);
+		//1200,8,N,1
 		this->Port.init(
 			(CStringA)COM,
-			9600,
+			1200,
 			itas109::Parity(itas109::Parity::ParityNone),
 			itas109::DataBits(itas109::DataBits::DataBits8),
 			itas109::StopBits(itas109::StopBits::StopOne),
-			itas109::FlowControl::FlowHardware);
-		this->Port.setOperateMode();
+			itas109::FlowControl::FlowHardware, 48);
 		if (this->Port.open())
 		{
 			this->PortsList.EnableWindow(FALSE);

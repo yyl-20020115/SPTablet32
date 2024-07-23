@@ -5,11 +5,12 @@
 #pragma once
 #include <CSerialPort/SerialPort.h>
 #include <vector>
+#include <string>
 // CSPTablet32Dlg 对话框
 class CSPTablet32Dlg : public CDialogEx, public itas109::CSerialPortListener
 {
 public:
-	static const size_t PacketLength = 5;
+	static const size_t PacketLength = 3;
 // 构造
 public:
 	CSPTablet32Dlg(CWnd* pParent = nullptr);	// 标准构造函数
@@ -23,13 +24,13 @@ public:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
 public:
 	virtual void onReadEvent(const char* portName, unsigned int readBufferLen);
-	virtual void onProcessPackets(const std::vector<unsigned char>& Buffer);
+	virtual void onProcessPacket(const std::basic_string<unsigned char>& Buffer, unsigned int& shift);
 
 // 实现
 protected:
 	HICON m_hIcon;
 	itas109::CSerialPort Port;
-	std::vector<unsigned char> Buffer;
+	std::string Buffer;
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);

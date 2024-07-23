@@ -9,6 +9,14 @@
 #include <dos.h>
 #endif
 
+#ifndef MICROSOFT_MOUSE
+#define MICROSOFT_MOUSE 0
+#endif
+
+#ifndef MMSYSTEM_MOUSE
+#define MMSYSTEM_MOUSE 1
+#endif
+
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -32,6 +40,7 @@ unsigned int setup_tablet(unsigned char choice, unsigned char as_emulation, unsi
 unsigned int setup_tablet_at(unsigned short port, unsigned char as_emulation, unsigned char mouse_type);
 unsigned char write_mcr(unsigned short port, unsigned char mode);
 unsigned char read_mcr(unsigned short port);
+unsigned char read_lsr(unsigned short port);
 unsigned char read_data_sp(unsigned short port, unsigned char* pch);
 unsigned char read_data(unsigned short port, unsigned char* pch);
 unsigned char set_interrupt(unsigned short port);
@@ -115,7 +124,7 @@ unsigned int setup_tablet_at(unsigned short port, unsigned char as_emulation, un
 	}
 	else if (ch == 4)
 	{
-		if (mouse_type == 0)
+		if (mouse_type == MICROSOFT_MOUSE)
 		{
 			cmd = 0x4B;
 		}
@@ -135,7 +144,7 @@ unsigned int setup_tablet_at(unsigned short port, unsigned char as_emulation, un
 	}
 	else if (ch == 3)
 	{
-		cmd = mouse_type == 0 ? 0x4B : 0;
+		cmd = mouse_type == MICROSOFT_MOUSE ? 0x4B : 0;
 	}
 	else
 	{
@@ -148,7 +157,11 @@ unsigned int setup_tablet_at(unsigned short port, unsigned char as_emulation, un
 				return FALSE;
 			}
 		_final:
-			if (mouse_type == 1)
+			if (mouse_type == MICROSOFT_MOUSE)
+			{
+				message = aResetTabletOk;
+			}
+			else
 			{
 				printf("%s", aSetTabletModeOK);
 				if (port == COM_PORT1)
@@ -156,14 +169,11 @@ unsigned int setup_tablet_at(unsigned short port, unsigned char as_emulation, un
 				else
 					message = aTabletConnectT_2;
 			}
-			else
-			{
-				message = aResetTabletOk;
-			}
 			printf("%s", message);
 			return TRUE;
 		}
-		cmd = mouse_type == 0 ? 0x4B : (as_emulation ? 0x5A : 0x6F);
+		cmd = mouse_type == MICROSOFT_MOUSE ? 0x4B 
+			: (as_emulation ? 0x5A : 0x6F);
 	}
 	write_data(port, cmd);
 	goto _final;
@@ -206,19 +216,57 @@ unsigned char read_mcr(unsigned short port)
 {
 	return __inbyte(port + 4);
 }
+unsigned char read_lsr(unsigned short port)
+{
+	return __inbyte(port + 5);
+}
+unsigned char read_dr(unsigned short port)
+{
+	return __inbyte(port);
+}
+unsigned char write_dr(unsigned short port, unsigned char data)
+{
+	__outbyte(port, data);
+	return data;
+}
 unsigned char write_mcr(unsigned short port, unsigned char mode)
 {
-	__outbyte(port + 4, mode);
+	__outbyte(port + 4, mode); //write mcr
+	return mode;
+}
+unsigned char write_ier(unsigned short port, unsigned char mode)
+{
+	__outbyte(port + 1, mode); //write ier
+	return mode;
+}
+unsigned char write_lcr(unsigned short port, unsigned char mode)
+{
+	__outbyte(port + 3, mode); //write lcr
+	return mode;
+}
+unsigned short write_bdr(unsigned short port, unsigned short baud_factor)
+{
+	__outbyte(port + 1, (unsigned char)((baud_factor >> 8) & 0xff));
+	__outbyte(port, (unsigned char)baud_factor & 0xff);
+	return baud_factor;
+}
+unsigned char read_imr()
+{
+	return __inbyte(0x21);
+}
+unsigned char write_imr(unsigned char mode)
+{
+	__outbyte(0x21,mode); //write imr
 	return mode;
 }
 unsigned char write_data(unsigned short port, unsigned char data)
 {
 	unsigned char status;
-	__inbyte(port + 4);
+	read_mcr(port);
 	do {
-		status = __inbyte(port + 5);
+		status = read_lsr(port);
 	} while (0 == (status & 0x20));
-	__outbyte(port, data);
+	write_dr(port, data);
 	return data;
 }
 unsigned char read_data_sp(unsigned short port, unsigned char* pch)
@@ -253,9 +301,9 @@ unsigned char read_data(unsigned short port, unsigned char* pch)
 	for (i = 0; i < 5; i++)
 	{
 
-		status = __inbyte(port + 5);
+		status = read_lsr(port);
 		if ((status & 1) != 0) {
-			data = __inbyte(port);
+			data = read_dr(port);
 			if (pch != 0) *pch = data;
 			return TRUE;
 		}
@@ -269,23 +317,22 @@ unsigned char read_data(unsigned short port, unsigned char* pch)
 unsigned char set_interrupt(unsigned short port)
 {
 	unsigned char val;
-	set_baud_rate(port, 0xB, 12);
-	val = __inbyte(0x21); //READ IMR
+	set_baud_rate(port, 0xB, 0xC); //9600,ODD,8,1
+	val = read_imr(); //READ IMR
 	if (port == COM_PORT2)
 		val &= 0xF7; //IRQ3
 	else
 		val &= 0xEF; //IRQ4
-	__outbyte(0x21, val);//0:Enable,1:Disable
-	__outbyte(port + 4, 0xB);//MCR
-	__outbyte(port + 1, 0x1);//IER: Enable Interrupt
+	write_imr(val);//0:Enable,1:Disable:: here is 0,enable
+	write_mcr(port, 0xB);//MCR: Reset Hardware
+	write_ier(port, 0x1);//IER: Enable Interrupt
 	return val;
 }
 unsigned char set_baud_rate(unsigned short port, unsigned char mode, unsigned short baud_factor)
 {
-	__outbyte(port + 3, 0x80);
-	__outbyte(port + 1, (unsigned char)((baud_factor >> 8) & 0xff));
-	__outbyte(port, (unsigned char)baud_factor & 0xff);
-	__outbyte(port + 3, mode);
+	write_lcr(port, 0x80);
+	write_bdr(port, baud_factor);
+	write_lcr(port, mode);
 	return mode;
 }
 unsigned char do_handshake(unsigned short port)
@@ -303,7 +350,7 @@ unsigned char do_handshake(unsigned short port)
 int main(int argc, char* argv[])
 {
 	int i = 0;
-	unsigned char choice = 0, as_emulation = 0, mouse_type = 1;
+	unsigned char choice = 0, as_emulation = 0, mouse_type = MMSYSTEM_MOUSE;
 #ifndef _WIN32
 	_AX = 0x160A;
 	geninterrupt(0x2f);
@@ -331,7 +378,7 @@ int main(int argc, char* argv[])
 			}
 			else if (0 == stricmp(argv[i], "/M"))
 			{
-				mouse_type = 0;
+				mouse_type = MICROSOFT_MOUSE;
 			}
 			else {
 				printf(aParameterError);
