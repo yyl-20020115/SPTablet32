@@ -6,6 +6,7 @@
 #include <CSerialPort/SerialPort.h>
 #include <vector>
 #include <string>
+#include <mutex>
 // CSPTablet32Dlg 对话框
 class CSPTablet32Dlg : public CDialogEx, public itas109::CSerialPortListener
 {
