@@ -411,18 +411,17 @@ void CSPTablet32Dlg::OnBnClickedButtonStart()
 	}
 	else if(this->PortsList.GetCount()>0)
 	{
-		int sel = this->PortsList.GetCurSel();
-		if (sel < 0) sel = 0;
-		INT_PTR port = this->PortsList.GetItemData(sel);
+		int SelIndex = this->PortsList.GetCurSel();
+		if (SelIndex < 0) SelIndex = 0;
+		INT_PTR PortNumber = this->PortsList.GetItemData(SelIndex);
+
 		CString COM;
-		COM.Format(_T("COM%d"),(int)port);
+		COM.Format(_T("COM%d"),(int)PortNumber);
 		CString COMPath = _T("\\\\.\\") + COM;
 
 		tablet_status status = setup_tablet(COMPath, microsoft_mouse_protocol);
-		if (status > 0) {
-			MessageBox(_T("SPTablet is initialized as a mouse!"), _T("SPTablet"));
-		}
-		else {
+		if (status <= 0) 
+		{
 			MessageBox(_T("SPTablet is NOT initialized as a mouse!"), _T("SPTablet"));
 		}
 		if (status > 0)
@@ -475,6 +474,7 @@ void CSPTablet32Dlg::OnBnClickedButtonHide()
 
 void CSPTablet32Dlg::OnClose()
 {
+	this->ShowWindow(SW_HIDE);
 	__super::OnClose();
 }
 
