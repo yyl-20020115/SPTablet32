@@ -260,35 +260,39 @@ HCURSOR CSPTablet32Dlg::OnQueryDragIcon()
 
 void CSPTablet32Dlg::OnBnClickedButtonStart()
 {
-	CString COM = _T("COM2");
-	CString COMPath = _T("\\\\.\\") + COM;
-
-	tablet_status status = setup_tablet(COMPath, microsoft_mouse_protocol);
-	if (status > 0) {
-		MessageBox(_T("SPTablet is initialized as a mouse!"), _T("SPTablet"));
-	}
-	else {
-		MessageBox(_T("SPTablet is NOT initialized as a mouse!"), _T("SPTablet"));
-	}
-	if (status > 0)
+	if (!this->Port.isOpen())
 	{
-		if (this->Port.isOpen()) {
-			this->Port.close();
-			this->Port.disconnectReadEvent();
-		}
-		this->Port.connectReadEvent(this);
-		//1200,8,N,1
-		this->Port.init(
-			(CStringA)COM,
-			1200,
-			itas109::Parity(itas109::Parity::ParityNone),
-			itas109::DataBits(itas109::DataBits::DataBits8),
-			itas109::StopBits(itas109::StopBits::StopOne),
-			itas109::FlowControl::FlowHardware, 48);
-		if (this->Port.open())
-		{
-			this->PortsList.EnableWindow(FALSE);
-		}
+		CString COM = _T("COM2");
+		CString COMPath = _T("\\\\.\\") + COM;
 
+		tablet_status status = setup_tablet(COMPath, microsoft_mouse_protocol);
+		if (status > 0) {
+			MessageBox(_T("SPTablet is initialized as a mouse!"), _T("SPTablet"));
+		}
+		else {
+			MessageBox(_T("SPTablet is NOT initialized as a mouse!"), _T("SPTablet"));
+		}
+		if (status > 0)
+		{
+			if (this->Port.isOpen()) {
+				this->Port.close();
+				this->Port.disconnectReadEvent();
+			}
+			//1200,8,N,1
+			this->Port.init(
+				(CStringA)COM,
+				1200,
+				itas109::Parity(itas109::Parity::ParityNone),
+				itas109::DataBits(itas109::DataBits::DataBits8),
+				itas109::StopBits(itas109::StopBits::StopOne),
+				itas109::FlowControl::FlowHardware, 48);
+			if (this->Port.open())
+			{
+				this->Port.connectReadEvent(this);
+
+				this->PortsList.EnableWindow(FALSE);
+			}
+
+		}
 	}
 }

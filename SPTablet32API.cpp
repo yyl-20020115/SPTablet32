@@ -37,10 +37,10 @@ tablet_status setup_tablet(LPCTSTR com_port, mouse_protocol mouse_type, bool as_
 
 		DCB dcb = { 0 };
 		dcb.DCBlength = sizeof(dcb);
-		done != 0 != GetCommState(hComm, &dcb);
+		done &= 0 != GetCommState(hComm, &dcb);
 		dcb.fDtrControl = 1;
 		dcb.fRtsControl = 1;
-		done != 0 != SetCommState(hComm, &dcb);
+		done &= 0 != SetCommState(hComm, &dcb);
 
 		//if ((read_mcr(hComm)&0x3) ==0)
 		//force reset tablet
