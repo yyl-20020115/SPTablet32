@@ -80,7 +80,7 @@ void CSPTablet32Dlg::onReadEvent(const char* portName, unsigned int readBufferLe
 				{
 					this->Buffer += (char*)data;
 					size_t p = 0;
-					while (((size_t)-1) != (p = this->onProcessPacket(this->Buffer.c_str(), this->Buffer.size())))
+					while (this->Buffer.size()>=PacketLength&&((size_t)-1) != (p = this->onProcessPacket(this->Buffer.c_str(), this->Buffer.size())))
 					{
 						this->Buffer = this->Buffer.substr(p);
 						if (this->Buffer.size() == 0) break;
@@ -120,9 +120,10 @@ size_t CSPTablet32Dlg::onProcessPacket(const char* buffer, size_t length)
 			bool left =  (bc & 0b00100000) != 0;
 			bool right = (bc & 0b00010000) != 0;
 
-			int dx = (char)(bx | (bc & 0b00000011) << 6);
-			int dy = (char)(by | (bc & 0b00001100) << 4);
-
+			int dx = (char)((bx&0b01111111) | (bc & 0b00000011) << 6);
+			int dy = (char)((by&0b01111111) | (bc & 0b00001100) << 4);
+			left = false;
+			right = false;
 			onSendInput(dx, dy, left, right);
 			return i;
 		}
@@ -157,12 +158,12 @@ UINT CSPTablet32Dlg::onSendInput(int dx, int dy, bool left, bool right)
 
 	input.mi.dx = dx;
 	input.mi.dy = dy;
-	static int index = 0;
-	CString text;
-	text.Format(_T("index = %08d, dx=%08d,dy=%08d,left=%d,right=%d\r\n"),index++, dx, dy, left, right);
-	OutputDebugString(text);
+	//static int index = 0;
+	//CString text;
+	//text.Format(_T("index = %08d, dx=%08d,dy=%08d,left=%d,right=%d\r\n"),index++, dx, dy, left, right);
+	//OutputDebugString(text);
 
-	//ret =SendInput(1, &input, sizeof(INPUT));
+	ret =SendInput(1, &input, sizeof(INPUT));
 	return ret;
 }
 
@@ -286,7 +287,7 @@ void CSPTablet32Dlg::OnBnClickedButtonStart()
 				itas109::Parity(itas109::Parity::ParityNone),
 				itas109::DataBits(itas109::DataBits::DataBits8),
 				itas109::StopBits(itas109::StopBits::StopOne),
-				itas109::FlowControl::FlowHardware, 48);
+				itas109::FlowControl::FlowHardware);
 			if (this->Port.open())
 			{
 				this->ButtonStart.SetWindowText(_T("停止"));

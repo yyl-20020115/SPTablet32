@@ -1,0 +1,787 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+
+  <title>9845 Mouse Project</title>
+  <script src="9845%20Mouse%20Project_files/highlight.js" type="text/javascript"></script>  <script src="9845%20Mouse%20Project_files/SpryMenuBar.js" type="text/javascript"></script>
+
+  <link href="9845%20Mouse%20Project_files/SpryMenuBarHorizontal.css" rel="stylesheet" type="text/css">
+  <link href="9845%20Mouse%20Project_files/main.css" rel="stylesheet" type="text/css">
+    <!--[if IE]>
+    <style type="text/css"> 
+      /* CSS-Korrekturen f|r alle IE-Versionen */
+      .main #sidebar1 { padding-top: 30px; }
+      .main #mainContent { zoom: 1; padding-top: 15px; }
+
+      /* CSS-Korrekturen f|r alle IE-Versionen unter 7.0 */
+      * html .main #header {margin-bottom: -3px}         /* IE 3-pixel-bug */
+      * html .main #gradient1 {margin-bottom: -6px}      /* IE 3-pixel-bug */
+    </style>
+    <![endif]-->
+    <style type="text/css">
+<!--
+.Stil1 {font-family: "Courier New", Courier, monospace}
+.Stil2 {font-size: x-small}
+-->
+    </style>
+</head>
+
+<body class="main" onload="highlight();">
+  <div id="container">
+
+    <script src="9845%20Mouse%20Project_files/header.js" type="text/javascript"></script>    <a name="top" id="top"></a>    <div id="header" style="background:#DAC78D">      <div style="width: 900px; padding: 0;">        <a href="https://www.hp9845.net/9845/index.html"><img src="9845%20Mouse%20Project_files/home.png" width="93" height="100" border="0"></a><img src="9845%20Mouse%20Project_files/topbar_title.png" width="800" height="100" border="0">      </div>    </div>    <!-- end #header -->    <div id="gradient1"></div>    <div style="margin-left: 0px; margin-right: 0px;">      <ul id="MenuBar1" class="MenuBarHorizontal">        <li>          <a class="MenuBarItemSubmenu" href="https://www.hp9845.net/9845/">Home</a>          <ul>            <li><a href="https://www.hp9845.net/9845/home/about.html">About This Site</a></li>            <li><a href="https://www.hp9845.net/9845/home/news.html">News</a></li>            <li><a href="https://www.hp9845.net/sphider/search.php">Search</a></li>            <li><a href="https://www.hp9845.net/9845/home/support.html">Supporting This Site</a></li>            <li><a href="https://www.hp9845.net/9845/home/guestbook.php">Guestbook</a></li>            <li><a href="https://www.hp9845.net/9845/home/contact.php">Contact</a></li>            <li><a href="https://www.hp9845.net/9845/home/sitemap.html">Sitemap</a></li>            <li><a href="https://www.hp9845.net/9845/home/downloads.html">Downloads</a></li>            <li><a href="https://www.hp9845.net/9845/home/terms.html">Terms of Use</a></li>          </ul>        </li>        <li>          <a class="MenuBarItemSubmenu" href="https://www.hp9845.net/9845/history">History</a>          <ul>            <li><a href="https://www.hp9845.net/9845/history/workstation">The Workstation Era</a></li>            <li><a href="https://www.hp9845.net/9845/history/story">The 9845 Story</a></li>            <li><a href="https://www.hp9845.net/9845/history/products">The Product Line</a></li>            <li><a href="https://www.hp9845.net/9845/history/team">The Production Team</a></li>            <li><a href="https://www.hp9845.net/9845/history/comparison">Comparing the 9845</a></li>          </ul>        </li>        <li>          <a class="MenuBarItemSubmenu" href="https://www.hp9845.net/9845/hardware">Hardware</a>          <ul>            <li><a href="https://www.hp9845.net/9845/hardware/packages">Packages &amp; Options</a></li>            <li><a href="https://www.hp9845.net/9845/hardware/9845a">The 9845A/S</a></li>            <li><a href="https://www.hp9845.net/9845/hardware/9835">The 9835A/B</a></li>            <li><a href="https://www.hp9845.net/9845/hardware/9845b">The 9845B/T</a></li>            <li><a href="https://www.hp9845.net/9845/hardware/9845c">The 9845C</a></li>            <li><a href="https://www.hp9845.net/9845/hardware/architecture">System Architecture</a></li>            <li><a href="https://www.hp9845.net/9845/hardware/processors">Processors</a></li>            <li><a href="https://www.hp9845.net/9845/hardware/displays">CRT Displays</a></li>            <li><a href="https://www.hp9845.net/9845/hardware/assemblies">Assemblies</a></li>            <li><a href="https://www.hp9845.net/9845/hardware/interfaces">Interfaces</a></li>            <li><a href="https://www.hp9845.net/9845/hardware/peripherals">Peripherals</a></li>          </ul>        </li>        <li>          <a class="MenuBarItemSubmenu" href="https://www.hp9845.net/9845/software">Software</a>          <ul>            <li><a href="https://www.hp9845.net/9845/software/architecture">Software Architecture</a></li>            <li><a href="https://www.hp9845.net/9845/software/packages">HP Software Packages</a></li>            <li><a href="https://www.hp9845.net/9845/software/hpplus">HP PLUS Software</a></li>            <li><a href="https://www.hp9845.net/9845/software/exchange">Exchange Library</a></li>            <li><a href="https://www.hp9845.net/9845/software/sysutils">System Utilities</a></li>            <li><a href="https://www.hp9845.net/9845/software/os">Operating System</a></li>            <li><a href="https://www.hp9845.net/9845/software/basic">9845 BASIC</a></li>            <li><a href="https://www.hp9845.net/9845/software/optionroms">Option ROMs</a></li>            <li><a href="https://www.hp9845.net/9845/software/binaries">Binary Programs</a></li>            <li><a href="https://www.hp9845.net/9845/software/screenart">Screen Art</a></li>            <li><a href="https://www.hp9845.net/9845/software/games">Games</a></li>          </ul>        </li>        <li>          <a class="MenuBarItemSubmenu" href="https://www.hp9845.net/9845/documents">Documents</a>          <ul>            <li><a href="https://www.hp9845.net/9845/documents/software">Software Documentation</a></li>            <li><a href="https://www.hp9845.net/9845/documents/user">User Documentation</a></li>            <li><a href="https://www.hp9845.net/9845/documents/service">Service Documentation</a></li>            <li><a href="https://www.hp9845.net/9845/documents/peripherals">Peripherals</a></li>            <li><a href="https://www.hp9845.net/9845/documents/catalogs">Catalogs &amp; Brochures</a></li>            <li><a href="https://www.hp9845.net/9845/documents/misc">Magazines, Patents &amp; Schematics</a></li>          </ul>        </li>        <li>          <a class="MenuBarItemSubmenu" href="https://www.hp9845.net/9845/projects">Projects</a>          <ul>            <li><a href="https://www.hp9845.net/9845/projects/romdump">ROM Dumping Project</a></li>            <li><a href="https://www.hp9845.net/9845/projects/romboard">ROM Board</a></li>            <li><a href="https://www.hp9845.net/9845/projects/hpdrive">HPDrive</a></li>            <li><a href="https://www.hp9845.net/9845/projects/hpdir">HPDir</a></li>            <li><a href="https://www.hp9845.net/9845/projects/hpprint">HPPrint</a></li>            <li><a href="https://www.hp9845.net/9845/projects/fdio">Fdio</a></li>            <li><a href="https://www.hp9845.net/9845/projects/9111">Digitizer/Plotter/Sound</a></li>            <li><a href="https://www.hp9845.net/9845/projects/utilities">9845 Utilities</a></li>            <li><a href="https://www.hp9845.net/9845/projects/assembler">9845 Assembler</a></li>            <li><a href="https://www.hp9845.net/9845/projects/mouse">9845 Mouse</a></li>            <li><a href="https://www.hp9845.net/9845/projects/featureboard">Feature Board</a></li>            <li><a href="https://www.hp9845.net/9845/projects/emulator">HP 9845 Emulator</a></li>          </ul>        </li>        <li>          <a class="MenuBarItemSubmenu" href="https://www.hp9845.net/9845/tutorials">Tutorials</a>          <ul>            <li><a href="https://www.hp9845.net/9845/tutorials/preparations">Before First Turning On</a></li>            <li><a href="https://www.hp9845.net/9845/tutorials/troubleshooting">Troubleshooting</a></li>            <li><a href="https://www.hp9845.net/9845/tutorials/savetapes">Saving Tapes</a></li>            <li><a href="https://www.hp9845.net/9845/tutorials/romdump">Dumping ROMs</a></li>            <li><a href="https://www.hp9845.net/9845/tutorials/pcconnect">Connecting to the PC</a></li>            <li><a href="https://www.hp9845.net/9845/tutorials/tapedrives">Tape Drive Repair</a></li>            <li><a href="https://www.hp9845.net/9845/tutorials/ramrepair">RAM Repair</a></li>            <li><a href="https://www.hp9845.net/9845/tutorials/networks">9845 Networks</a></li>            <li><a href="https://www.hp9845.net/9845/tutorials/bitmaps">Using Bitmaps</a></li>            <li><a href="https://www.hp9845.net/9845/tutorials/gamedesign">9845 Game Design</a></li>            <li><a href="https://www.hp9845.net/9845/tutorials/testrom">9845 Test ROM</a></li>            <li><a href="https://www.hp9845.net/9845/tutorials/analyzer">Using Logic Analyzers</a></li>            <li><a href="https://www.hp9845.net/9845/tutorials/hpib">HP-IB/GPIB</a></li>          </ul>        </li>        <li><a href="https://www.hp9845.net/9845/links">Links</a></li>      </ul>    </div>    <div id="gradient2"></div>    <!-- end navigation -->
+
+    <div id="sidebar_left">
+      <h2>Quicklinks</h2>
+      <ul>
+        <li><a href="#why">Why and How</a></li>
+        <li><a href="#history">A Brief History of Computer Mice</a></li>
+        <li><a href="#operating">Operating a Serial Mouse with an HP9845</a></li>
+        <li><a href="#tailoring">Tailoring HP 9845 Programs for Mouse Use</a></li>
+        <li><a href="#demo">A Sample Mouse Driver Graphics Demo Application</a></li>
+        <li><a href="#downloads">Downloads</a></li>
+      </ul>
+    <!-- end #sidebar_left -->
+    </div>    
+
+    <div id="mainContent_right">
+      <h1>9845 Mouse Project</h1>
+
+      <h2><a name="why" id="why"></a>Why and How</h2>
+      <p>At the design time of the HP 9845, human interaction already 
+was an important issue for computer systems, however a computer mouse 
+was not part of the concept. Instead, several other pointer devices were
+ offered, like digitizers, light pens or graphic tablets. Even the arrow
+ keys could be used to position a cursor, and some plotters could be 
+used in a reverse mode to feed their position back into the host system.
+ But no mouse was available. Not for the HP 9845 and not for any other 
+system, except the famous Xerox Alto, which had been the grandfather 
+prototype platform for many of the modern human engineering concepts, 
+including a window based graphical user interface or - using a computer 
+mouse as pointing device.</p>
+      <p>Ok, the HP 9845 didn't have a mouse support. But there were 
+enough other means for positioning and pointing. So, where is the 
+problem?</p>
+      <ol>
+        <li>The HP 9111A graphics tablet is rare, the light pen is very 
+rare, and the digitizer is super rare. If you like to use the 
+interactive graphics features of the 9845, you'll in most cases have to 
+be satisfied with the arrow keys.</li>
+        <li>Theoretically, it could be possible to connect a standard 
+serial mouse via a serial interface to the 9845. And just as it is with 
+climbing high mountains, if it can be done, this is reason enough to do 
+it.</li>
+      </ol>
+      <p>So I tried and I was surprised how good it works.</p>
+      <h2><a name="history" id="history"></a>A Brief History of Computer Mice</h2>
+      <p>As far as we know today, the computer mouse as a pointing 
+device goes back to the years 1963/1964, when Douglas C. Engelbart and 
+his collegue William English worked with their team at the  Stanford 
+Research Institute (SRI) on different pointing devices for computer 
+systems. First presentation to the public was at the autumn summit of 
+the American Federation of Information Processing Societies (AFIPS). 
+Later in 1970 Engelbart received patent US3541541 for an "X-Y Position 
+Indicator for a Display System". Doug Engelbart's construction was based
+ on two wheels, which were mounted in a 90° angle. William English 
+changed over to the Xerox Palo Alto Research Center (PARC), where the 
+ball mouse was developed with its first use in the Xerox Alto in 1973.</p>
+      <p align="center"><img src="9845%20Mouse%20Project_files/ur-maus-1.jpg" alt="Ur-Mouse" width="296" height="200" border="1">&nbsp;<img src="9845%20Mouse%20Project_files/ur-maus-2.jpg" alt="Ur-Mouse" width="298" height="200" border="1"></p>
+      <p align="center"><strong>Doug Engelbarts' Original Mouse Prototype</strong></p>
+      <p>First commercial applications were with the Xerox Star in 1981 
+and the Apple Lisa in 1983, however both with limited commercial 
+success. This changed completely with the Apple Macintosh in 1984, where
+ the concepts previously prooved with the Lisa were implemented in a 
+convenient, coherent and - most important - affordable manner.</p>
+      <p>I personally was immediately convinced when playing around in 
+1984 with an early Macintosh, that this concept would conquer the 
+mainstream market. The 80's proceeded with the ball mouse as standard, 
+low-cost pointing device for most subsequent systems. The IBM PC, when 
+launched in 1981, actually didn't yet support mice pointers (in fact, 
+the graphical user interface was completely missing). The PS/2 series 
+was the first officially offering a mouse device for the PC, the PS/2 
+mouse, in 1987. In the end of the 90's, the optical mouse started to 
+displace the ball mouse, offering a more accurate and less dirt 
+sensitive tracking mechanism.</p>
+      <p align="center"><img src="9845%20Mouse%20Project_files/macintosh-mice.jpg" alt="Macintosh Mice" width="276" height="200" border="1">&nbsp;<img src="9845%20Mouse%20Project_files/modern-optical-mouse.jpg" alt="Modern Optical Mouse" width="267" height="200" border="1"></p>
+      <p align="center"><strong>Original Macintosh Mouse and Modern Optical Mouse</strong></p>
+      <p>The first mice did have ony one button, as did the original 
+prototype of Doug Engelbart and the first Lisa and Macintosh mice. The 
+first Microsoft and PS/2 mice already provided two buttons, and Logitech
+ presented the first sucessfully selled three-button mouse in 1985 
+(perfect example of making business by just adding a simple but useful 
+feature). Commercial workstations generally used three-button mice, 
+especially when operated with X Window based GUIs.</p>
+      <h2><a name="operating" id="operating"></a>Operating a Serial Mouse with an HP9845</h2>
+      <h3>Prerequisites</h3>
+      <p>For using the mouse as a pointer device with an HP9845, you need</p>
+      <ol>
+        <li>a 98036A RS-232C serial interface (either standard with DTE connector or option 001 with DCE connector),</li>
+        <li>an RS-232C serial Microsoft compatible mouse,</li>
+        <li>if required, an 9-to-25-pin adaptor for connecting the mouse to the 98036A serial interface, plus</li>
+        <li>one of the Assembly Language option ROMs (either the 
+Assembly Execution or the Assembly Execution &amp; Development ROM), I/O
+ Option ROMs recommended.</li>
+      </ol>
+      <p align="center"><img src="9845%20Mouse%20Project_files/mouse-accessories.jpg" alt="Mouse Accessories" width="500" height="414" border="1"></p>
+      <p align="center"><strong>98036A opt. 001 Serial Interface, Standard 9-pin-to-25-pin<br>
+      Adaptor and Logitech 3-button Mouse</strong></p>
+      <p>Because a serial mouse device operates as a DCE (data 
+communication equipment), the normal connection of a serial mouse device
+ is via a 98036A <em>opt. 001</em> interface. If the mouse has a 9-pin SUB-D connector, you can use a standard 9-pin-to-25-pin adaptor with the following wiring:</p>
+      <table width="550" border="0" align="center" cellpadding="10" cellspacing="0" style="width:550px;text-align:center">
+        <tbody><tr>
+          <td><strong>9-pin Mouse<br>
+            (female)</strong></td>
+          <td><strong>25-pin 98036A<br>
+          opt. 001 (male)</strong></td>
+          <td><strong>Signal</strong></td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>8</td>
+          <td>DCD (Data Carrier Detect)</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>3</td>
+          <td>RxD (Receive Data)</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>2</td>
+          <td>TxD (Transmit Data)</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>20</td>
+          <td>DTR (Data Terminal Ready)</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>7</td>
+          <td>GND (Signal Ground)</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>6</td>
+          <td>DSR (Data Set Ready)</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>4</td>
+          <td>RTS (Request to Send)</td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td>5</td>
+          <td>CTS (Clear to Send)</td>
+        </tr>
+        <tr>
+          <td>n/c</td>
+          <td>n/c</td>
+          <td>RI (Ring Indicator)</td>
+        </tr>
+        <tr>
+          <td>Shield</td>
+          <td>Shield</td>
+          <td>Shield</td>
+        </tr>
+      </tbody></table>
+      <p>If using a 98036A <em>standard</em> serial interface (which usually connects to DTEs), the 9-to-25-pin adaptor must have a null-modem wiring:</p>
+      <table width="550" border="0" align="center" cellpadding="10" cellspacing="0" style="width:550px;text-align:center">
+        <tbody><tr>
+          <td>&nbsp;</td>
+          <td><strong>9-pin Mouse<br>
+            (female)</strong></td>
+          <td><strong>25-pin 98036A Standard (female)</strong></td>
+          <td><strong>Signal</strong></td>
+        </tr>
+        <tr>
+          <td>DCD (Data Carrier Detect)</td>
+          <td>1</td>
+          <td>8</td>
+          <td>DCD (Data Carrier Detect)</td>
+        </tr>
+        <tr>
+          <td>RxD (Receive Data)</td>
+          <td>2</td>
+          <td>2</td>
+          <td>TxD (Transmit Data)</td>
+        </tr>
+        <tr>
+          <td>TxD (Transmit Data)</td>
+          <td>3</td>
+          <td>3</td>
+          <td>RxD (Receive Data)</td>
+        </tr>
+        <tr>
+          <td>DTR (Data Terminal Ready)</td>
+          <td>4</td>
+          <td>6</td>
+          <td>DSR (Data Set Ready)</td>
+        </tr>
+        <tr>
+          <td>GND (Signal Ground)</td>
+          <td>5</td>
+          <td>7</td>
+          <td>GND (Signal Ground)</td>
+        </tr>
+        <tr>
+          <td>DSR (Data Set Ready)</td>
+          <td>6</td>
+          <td>20</td>
+          <td>DTR (Data Terminal Ready)</td>
+        </tr>
+        <tr>
+          <td>RTS (Request to Send)</td>
+          <td>7</td>
+          <td>5</td>
+          <td>CTS (Clear to Send)</td>
+        </tr>
+        <tr>
+          <td>CTS (Clear to Send)</td>
+          <td>8</td>
+          <td>4</td>
+          <td>RTS (Request to Send)</td>
+        </tr>
+        <tr>
+          <td>RI (Ring Indicator)</td>
+          <td>n/c</td>
+          <td>n/c</td>
+          <td>RI (Ring Indicator)</td>
+        </tr>
+        <tr>
+          <td>Shield</td>
+          <td>Shield</td>
+          <td>Shield</td>
+          <td>Shield</td>
+        </tr>
+      </tbody></table>
+      <h3>Preparations</h3>
+      <p>The 98036A interface has to be configured to a data rate of 
+1,200 baud, there is a second small switch at the side of the interface 
+(NOT the select code switch on the upper side of the interface!) which 
+has to be set manually to 5 (=1,200 baud). The select code actually 
+doesn't matter as long as no other interface uses the same select code, 
+however it is recommended to use select code 10 for the 98036A standard 
+interface and select code 11 for the 98036A opt. 001 interface.</p>
+      <h3>The Microsoft Serial Mouse Protocol</h3>
+      <p>I've chosen the Microsoft serial mouse for a test since most 
+serial mice do support the communication protocol used by this standard 
+type of computer mouse. Note that the PS/2 mouse works slightly 
+different and is neither compatible to RS-232C nor to the serial mouse 
+protocol.</p>
+      <p>The original Microsoft mouse has two buttons and two axis. In 
+contrast to e.g. a graphics tablet, not the absolute position is 
+transmitted to the host, but the relative movement. For communication, 
+an RS-232C connection is used with 1,200 baud, no parity, 7 data bits 
+and one stop bit (1200-N-7-1). The power supply is done via the RTS and 
+DTR lines, so both lines must be permanently set positive by the host 
+for proper operation.</p>
+      <p>Data is sent to the host with each mouse event, which in turn 
+is triggered either by pressing or releasing a button or by mouse 
+movement. Each event generates a package of three bytes, with the 
+following meaning:</p>
+      <blockquote>
+        <p class="Stil1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bit7 Bit6 Bit5 Bit4 Bit3 Bit2 Bit1 Bit0<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+----+----+----+----+----+----+----+----+<br>
+          Byte 1: | &nbsp;X |&nbsp; 1 | LB | RB | Y7 | Y6 | X7 | X6 |<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+----+----+----+----+----+----+----+----+<br>
+          Byte 2: | &nbsp;X |&nbsp; 0 | X5 | X4 | X3 | X2 | X1 | X0 |<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+----+----+----+----+----+----+----+----+<br>
+          Byte 3: | &nbsp;X |&nbsp; 0 | Y5 | Y4 | Y3 | Y2 | Y1 | Y0 |<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+----+----+----+----+----+----+----+----+</p>
+      </blockquote>
+      <p>With bit 7 of each byte as 'don't care'-bit, bit 6 as sync bit 
+for indicating a new byte sequence, LB as the left button state with 
+LB=0 if released and LB=1 if pressed, RB as the right button state, 
+Y7..Y0 as signed vertical motion and X7..X0 as signed horizontal motion 
+(both in 2's complement notation if negative). Both motion values are in
+ the range of -128 to +127.</p>
+      <h3>The Mouse Driver Implementation</h3>
+      <p>A good mouse driver should</p>
+      <ul>
+        <li>capture all mouse data,</li>
+        <li>work in the background without disturbing the running user program,</li>
+        <li>control the hardware cursor directly without the user program involved,</li>
+        <li>activate appropriate handler routines in the user program as required,</li>
+        <li>be capable to be enabled and disabled as needed,</li>
+        <li>support both text and graphics mode.</li>
+      </ul>
+      <p>The normal use would be in a BASIC program, however for proper 
+operation the mouse driver itself must be programmed in assembly 
+language, and therefore requires an Assembly Execution or Assembly 
+Execution and Development option ROM installed. Actually, the mouse 
+driver is a perfect example for how the interrupt I/O system of the 
+HP9845 can be used.</p>
+      <p>First, there has to be a routine which registers another 
+routine, the interrupt service routine (ISR), as system level handler 
+for all interrupts generated from serial input. The routine also has to 
+do further initializations, like setting up the proper communication 
+parameters for the serial line and enabling the interface. Once 
+registered, each byte of serial input data generates a call to the 
+interrupt service routine, which then takes the byte from the interface,
+ performs the appropriate operations on this byte, and finally tells the
+ interface to accept the next byte from the mouse device.</p>
+      <p>When all three bytes are complete, the interrupt service 
+routine checks whether one of the conditions are met which had been 
+previously requested from the BASIC user program (like button up or 
+button down events), issues the events to the running BASIC program, and
+ updates the cursor position.<br class="clearfloat">
+      </p>
+      <p>
+      Finally, two other routines are required: one for setting mouse 
+parameters like the type of events the BASIC program is interested in or
+ the type of graphical cursor which should be displayed, and another 
+routine for terminating (de-installing) the mouse driver.</p>
+      <p>For the notification from the interface to the interrupt 
+service routine, system-level interrupts are used. For the communication
+ from the ISR to the BASIC program, BASIC level interrupts are used. 
+Both have a certain relation in that every BASIC level interrupt is the 
+result of a change in the input data, which again is triggered by a 
+system-level interrupt. However, the BASIC program defines which type of
+ change it wants to be notified for.</p>
+      <p>I wrote a sample driver (simply called "Mousedriver") which 
+demonstrates how to implement and use interrupt-driven system-level I/O 
+and which uses the following assembly language routines to perform the 
+tasks decribed above:</p>
+      <blockquote>
+        <p><strong>Mouse_on(&lt;select_code&gt;)</strong></p>
+        <blockquote>
+          <p>Installs the driver for the serial interface with select 
+code &lt;select_code&gt;, which is usually either 10 or 11 for serial 
+interfaces.</p>
+        </blockquote>
+        <p><strong>Mouse_set(&lt;event_mask&gt;, &lt;cursor_type&gt;, &lt;cursor_color&gt;, &lt;vsync&gt;)</strong></p>
+        <blockquote>
+          <p>Configures which events should be reported to the user program, and which cursor type should be displayed on mouse movement.</p>
+          <p>&lt;event_mask&gt; is an ORed combination of</p>
+          <blockquote>
+            <p>1 for right button up,<br>
+              2 for right button down,<br>
+              4 for left button up and<br>
+              8 for left button down events,</p>
+          </blockquote>
+          <p>&lt;cursor_type&gt; is either</p>
+          <blockquote>
+            <p>0 for no cursor, or<br>
+              1 for a full screen cursor, or<br>
+              2 for a small cross cursor, or<br>
+              3 for an underline blinking cursor.</p>
+          </blockquote>
+          <p>&lt;cursor_color&gt; is for selecting the color of the cursor (effect on 9845C only). Use</p>
+          <blockquote>
+            <p>0 for White<br>
+              1 for Cyan<br>
+              2 for Magenta<br>
+              3 for Blue<br>
+              4 for Yellow<br>
+              5 for Green<br>
+              6 for Red and<br>
+              7 for Black.</p>
+          </blockquote>
+          <p>Set &lt;vsync&gt; to 1 if the interrupt service routine 
+should wait for vertical retrace before redrawing the cursor, otherwise 
+set &lt;vsync&gt; to 0 (which is the recommended value unless you 
+discover cursor flicker during move). All hardware cursors require 
+graphics mode enabled (GRAPHICS command).</p>
+        </blockquote>
+        <p><strong>Mouse_get(&lt;event&gt;, &lt;lbutton&gt;, &lt;rbutton&gt;, &lt;xpos&gt;, &lt;ypos&gt;)</strong></p>
+        <blockquote>
+          <p>Retrieves the current mouse state, including the latest 
+events delivered from the system-level interrupt service routine to the 
+BASIC user program (as logically or'ed combination of the events 
+mentioned above), the current state of the mouse buttons and the current
+ absolute position of the pointer (independent whether the cursor is 
+visible or not). &lt;lbutton&gt; and &lt;rbutton&gt; are returned as 1 
+for button down and 0 for button up. &lt;xpos&gt; is in the range 
+between 0 and 559, &lt;ypos&gt; in the range of 0 to 454. Origin is the 
+upper left screen corner.</p>
+          <p>Note that the button up/down event(s) which originally 
+caused the notification and which are documented in &lt;event&gt; are 
+not necessarily identical with the current state of the mouse buttons.</p>
+        </blockquote>
+        <p><strong>Mouse_off</strong></p>
+        <blockquote>
+          <p>Initiates a shut-down of the mouse driver*.</p>
+        </blockquote>
+      </blockquote>
+      <p><span class="Stil2">*Note that mouse driver shutdown actually 
+has to be performed from within the system-level interrupt service 
+routine (ISR), so it can require to make a short mouse move or click 
+after calling the Mouse_off routine in order to definitly terminate the 
+driver. Otherwise, an Error 193 can be the result of an IDELETE 
+statement because there is still an active handler which can't be 
+deleted.</span></p>
+      <p>All routines are used inside a BASIC program with a preceeding 
+ICALL statement. The implementation is quite generic and should work in 
+any 9845 system. It has been tested on 9845B with standard graphics 
+option and 9845C models.</p>
+      <p>Generally, there are two types of use. Once the mouse driver is
+ installed, the mouse state can either be interrogated in regular 
+intervals (polling) by calling the Mouse_get() routine, or a mouse 
+events can be directed to a special BASIC routine (which then calls the 
+Mouse_get() routine). For most cases, the latter option is the better 
+solution, since mouse events can be immediately handled.</p>
+      <p>An appropriate BASIC event handler can easily be implemented with</p>
+      <blockquote>
+        <p class="Stil1">&nbsp;&nbsp;ICOM 1000&nbsp;&nbsp;<br>
+          &nbsp;&nbsp;INTEGER Event,Lbutton,RButton,Xpos,Ypos<br>
+          &nbsp;&nbsp;ILOAD 
+"MSDRV"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; !
+ Load mouse driver assembly module<br>
+&nbsp;&nbsp;Sc=10&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;!
+ Select code for serial interface<br>
+          &nbsp;&nbsp;ICALL 
+Mouse_on(Sc)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;!
+ Install mouse driver<br>
+          &nbsp;&nbsp;ON INT&nbsp;#Sc GOSUB Mouse_handler&nbsp;! Define mouse notification handler<br>
+          &nbsp;&nbsp;ICALL 
+Mouse_set(8+2,2,0,0)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;! Enable notifications
+ on left &amp; right button down<br>
+          &nbsp;&nbsp;...<br>
+        Event_loop: GOTO Event_loop<br>
+        &nbsp;&nbsp;...<br>
+          
+Mouse_handler:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; !
+ Notification handler for mouse events<br>
+          &nbsp;&nbsp;ICALL Mouse_get(Event,Lbutton,Rbutton,Xpos,Ypos)<br>
+          &nbsp;&nbsp;... do something with the data ...<br>
+          &nbsp;&nbsp;RETURN<br>
+        </p>
+      </blockquote>
+      <p>where Sc is the select code of the serial interface. In order 
+not to disturb the user program, some critical operations (especially 
+DMA transfers) must not be interrupted, so there has to be a way to 
+disable the generation of mouse initiated interrupts. The general 
+procedure for quickly disabling and re-enabling interrupts generated 
+from serial input data is via the statements</p>
+      <blockquote>
+        <p class="Stil1">WAIT WRITE Sc,5;0	(for disabling serial interrupts)<br>
+        ... do some critical procedures in between ...<br>
+        WAIT WRITE Sc,5;132 (for re-enabling serial interrupts)</p>
+      </blockquote>
+      <p>where Sc is again the select code of the serial interface. 
+These commands should always be used for disabling interrupts during 
+graphics draw operations (which normally are using DMA transfers). Note 
+that for the WAIT WRITE statement, the I/O Option ROMs are required.</p>
+      <p>As a conclusion, the mouse driver works fine with the 9845 
+architecture, and it's too bad a mouse wasn't available at the design 
+time of the system.</p>
+      <h2><a name="tailoring" id="tailoring"></a>Tailoring HP 9845 Programs for Mouse Use</h2>
+      <p>Using the mouse functions in existing HP 9845 BASIC programs 
+needs some code modifications. HP 9845 BASIC already includes several 
+ways to input cursor data. The devices supported are arrow keys, 
+digitizer tablets, plotters and the light pen. Since HP 9845 BASIC uses a
+ unified approach for handling graphics input, the way standard input 
+devices are being set up and queried are in general the same for all 
+devices:</p>
+      <ol>
+        <li>The desired device is selected for input with a GRAPHICS INPUT IS statement,</li>
+        <li>the drawing areas are defined with clipping statements, such as LIMIT and CLIP,</li>
+        <li>the measurement units are defined with scaling statements, 
+such as LOCATE, SCALE, MSCALE and SHOW, plus selection of the unit mode 
+with SETGU and SETUU,</li>
+        <li>end-of-line interrupts may be defined for handling button press events generated by the input device with the ON GKEY statement,</li>
+        <li>cursor tracking is specified as desired with the TRACK IS ON statement, and</li>
+        <li>the cursor position and type is specified with a POINTER statement.</li>
+      </ol>
+      <p>Note that for normal graphics operation, not all of the above steps have to be necessarily performed.</p>
+      <p>Once the input device is configured, cursor input can be 
+queried any time with the CURSOR or DIGITIZE statements. Also, input can
+ be selectively enabled and disabled with the GRAPHICS INPUT IS ON and 
+GRAPHICS INPUT IS OFF statements.</p>
+      <p>The mouse driver doesn't use the unified graphics model, but 
+instead operates independently and on pixel units. If you plan to modify
+ an existing HP 9845 BASIC program for using the mouse instead of one of
+ the standard input devices, you will have to change the statements 
+mentioned above in the following way:</p>
+      <h3>GRAPHICS INPUT IS &lt;input device&gt;</h3>
+      <p>Comment out all occurences of this statement. Instead, add the following code at the beginning of the program:</p>
+      <blockquote>
+        <p><span class="Stil1">ICOM 1000<br>
+        INTEGER Event,Lbutton,RButton,Xpos,Ypos<br>
+        
+Sc=10&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;!
+ Select code for serial interface<br>
+        
+Xoffset=0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;!
+ Horizontal offset of plotting area in GDUs<br>
+        
+Yoffset=0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;!
+ Vertical offset of plotting area in GDUs<br>
+        
+Xscale=123/560&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;!
+ Horizontal pixel-to-unit ratio<br>
+        
+Yscale=100/455&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;!
+ Vertical pixel-to-unit ratio<br>
+        ILOAD 
+"MSDRV"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; !
+ Load mouse driver assembly module<br>
+ICALL Mouse_on(Sc)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;! Install mouse driver<br>
+        ICALL Mouse_set(8+2,2,0,0)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;! Enable notifications on left &amp; right button down</span><br>
+        </p>
+      </blockquote>
+      <h3>LIMIT, CLIP and UNCLIP</h3>
+      <p>Leave those statements as is (no change).</p>
+      <p>After setting the clip areas, store the new coordinates of the 
+lower left screen corner (default 0,0) into the variables Xoffset and 
+Yoffset after every change of the clipping areas. You will need this 
+information later to recover the 9845 graphics pointer coordinates from 
+the pixel data returned by the Mouse_get() routine. Also change the sign
+ of the Xscale and/or Yscale variable if the coordinate system gets 
+mirrored (i.e. Xmin &gt; Xmax or Ymin &gt; Ymax when using LIMIT).</p>
+      <h3>LOCATE, SCALE, MSCALE and SHOW</h3>
+      <p>Leave those statements as is (no change).</p>
+      <p>After setting the scale, store the resulting pixel-to-unit 
+ratios (=units per pixel) into the variables Xscale and Yscale. You will
+ need this information later to recover the 9845 graphics pointer 
+coordinates from the pixel data returned by the Mouse_get() routine. 
+Default plotting range for the CRT graphics is 123 units in X direction 
+and 100 units in Y direction. So default value for Xscale and Yscale is 
+123/560 = 100/455 ~ 0.22. If the new coordinate of the lower left screen
+ corner differs from 0,0, also adjust Xoffset and Yoffset to the new 
+values.</p>
+      <h3>ON GKEY [&lt;priority&gt;,] &lt;statement&gt;</h3>
+      <p>Comment out  all occurences of this statement and replace by the following statement:</p>
+      <blockquote>
+        <p><span class="Stil1">ON INT&nbsp;#Sc [&lt;priority&gt;,]&lt;statement&gt;</span></p>
+      </blockquote>
+      <h3>OFF GKEY</h3>
+      <p>Comment out  all occurences of this statement and replace by the following statement:</p>
+      <blockquote>
+        <p><span class="Stil1">OFF INT&nbsp;#Sc &lt;statement&gt;</span></p>
+      </blockquote>
+      <h3>TRACK &lt;select code&gt; IS ON</h3>
+      <p>Leave those statements as is or comment them out (they have no 
+relevance for the mouse driver but may slow down overall processing).</p>
+      <h3>POINTER &lt;x&gt;, &lt;y&gt;[, &lt;type&gt;[, &lt;color&gt;]]</h3>
+      <p>Leave those statements as is or comment them out (they have no relevance for the mouse driver).</p>
+      <h3>CURSOR &lt;x&gt;, &lt;y&gt;[,  &lt;device string&gt;]</h3>
+      <p>Comment out all occurences of this statement. Instead use the following code:</p>
+      <blockquote>
+        <p class="Stil1">ICALL Mouse_get(Event,Lbutton,Rbutton,Xpos,Ypos)<br>
+        &lt;x&gt;=Xpos*Xscale-Xoffset<br>
+        &lt;y&gt;=Ypos*Yscale-Yoffset</p>
+      </blockquote>
+      <p>If &lt;device_string&gt; is going to be processed after the 
+CURSOR statement, create the string according to the device which has 
+been addressed manually. Here are examples for setting up the string for
+ a replacement of the arrow keys, the light pen or the 9111A tablet 
+(assuming cursor position is always within clipping limits):</p>
+      <blockquote>
+        <p class="Stil1"> ! Arrow keys (button is never down)<br>
+        &lt;device string&gt;="0,2,0"</p>
+        <p class="Stil1"> ! Light pen<br>
+          &lt;device string&gt;="0,2,0,1,1"<br>
+        &lt;device string&gt;[1;1]=VAL$(Lbutton)</p>
+        <p class="Stil1">  ! 9111A tablet<br>
+          &lt;device string&gt;="0,2,0,00,00,0020,0"<br>
+        &lt;device string&gt;[1;1]=VAL$(Lbutton)</p>
+        </blockquote>
+      <h3>DIGITIZE &lt;x&gt;, &lt;y&gt;[,  &lt;device string&gt;]</h3>
+      <p>Comment out all occurences of this statement. Instead use the following code:</p>
+      <p class="Stil1">&nbsp;&nbsp;Loop: !<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;ICALL Mouse_get(Event,Lbutton,Rbutton,Xpos,Ypos)<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;IF NOT Event THEN Loop<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&lt;x&gt;=Xpos*Xscale-Xoffset<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&lt;y&gt;=Ypos*Yscale-Yoffset</p>
+      <p>See the CURSOR statement above for how to handle the &lt;device string&gt;.</p>
+      <h3>GRAPHICS INPUT &lt;input device&gt; IS OFF</h3>
+      <p>Comment out all occurences of this statement (they have no 
+relevance for the mouse driver). Instead use the following statement to 
+disable mouse input:</p>
+      <blockquote>
+        <p><span class="Stil1">WAIT WRITE Sc,5;0</span></p>
+      </blockquote>
+      <p>It is always a good idea to disable mouse interrupts during 
+graphics draw operations (especially on standard graphics), since mouse 
+interrupts may disturb the data transfer between the mainframe and the 
+graphics subsystem.</p>
+      <h3>GRAPHICS INPUT &lt;input device&gt; IS ON</h3>
+      <p>Comment out all occurences of this statement (they have no 
+relevance for the mouse driver). Instead use the following statement to 
+re-enable mouse input:</p>
+      <blockquote>
+        <p><span class="Stil1">WAIT WRITE Sc,5;132</span></p>
+      </blockquote>
+      <h2><a name="demo" id="demo"></a>A Sample Mouser Driver Graphics Demo Application</h2>
+      <p>As an example how to use the mouse driver, some keyboard events
+ and, in addition, how to utilize many of the graphics features of a 
+9845B/C, I've written a small drawing program which uses both mouse and 
+keyboard control, quite similar to common painting programs. The program
+ is also pretty useful for loading, editing, printing and saving binary 
+graphics data on a 9845 system.</p>
+      <p>The whole demo program is not only a good application for 
+showing the 9845 mouse feature, but it is also a nice tutorial on 
+several graphics techniques like how to determine the installed graphics
+ hardware, how to use graphics commands, how to print, load or save 
+graphics data, how to use the powerful MAT PLOT feature, and how to 
+implement "pop up windows" or help screens without destroying the 
+graphics content.</p>
+      <p>Note that there are two versions of the program depending on 
+the firmware you have installed in your system, one for standard 
+graphics ROM and one for color/enhanced graphics ROM. Reason behing is 
+that the color/enhanced graphics ROM provides a couple of commands which
+ are not available in the standard graphics firmware.</p>
+      <p>The content of the mouse driver image includes the following files:</p>
+      <table width="100%" border="0" cellspacing="0" cellpadding="5">
+        <tbody><tr>
+          <td>MSDRV.ASMB</td>
+          <td>Machine language driver module, to be loaded with an ILOAD command (Assembler ROM required)</td>
+        </tr>
+        <tr>
+          <td>MSDRV_.DATA</td>
+          <td>Mouse driver assembler source program in text format, to be loaded with a GET command (Assembler ROM required)</td>
+        </tr>
+        <tr>
+          <td width="20%">COLOR.PROG</td>
+          <td width="80%">Mouser driver demo draw program for enhanced 
+and color graphics, to be loaded with a LOAD command (color/enhanced 
+graphics ROM required)</td>
+        </tr>
+        <tr>
+          <td>COLOR_.DATA</td>
+          <td>Same as above but in text format, to be loaded with a GET 
+command (actually safe to be run on a standard graphics system since all
+ unsupported commands will automatically be outcommented during the GET 
+process - in contrast to the COLOR.PROG above)</td>
+        </tr>
+        <tr>
+          <td>MONO.PROG</td>
+          <td>Mouser driver demo draw program for standard monochrome 
+graphics, to be loaded with a LOAD command (works with any graphics 
+firmware but won't support color or polygons, all color/enhanced 
+graphics commands are outcommented)</td>
+        </tr>
+        <tr>
+          <td>MONO_.DATA</td>
+          <td>Same as above but in text format, to be loaded with a GET command</td>
+        </tr>
+        <tr>
+          <td>9845.BDAT</td>
+          <td>Sample bitmap file for standard monochrome graphics</td>
+        </tr>
+        <tr>
+          <td>SAMPL1.BDAT</td>
+          <td>Sample bitmap file for color graphics (part1), bitmap can 
+be loaded within the mouse driver demo draw program, simply issue 
+"SAMPL" when asked for a filename</td>
+        </tr>
+        <tr>
+          <td>SAMPL2.BDAT</td>
+          <td>Sample bitmap file for color graphics (part2), loaded automatically after the first part</td>
+        </tr>
+        <tr>
+          <td>SAMPL3.BDAT</td>
+          <td>Sample bitmap file for color graphics (part3), loaded automatically after the second part</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+      </tbody></table>
+      <p>The demo provides a canvas which can be freely drawn or filled 
+with lines, rectangular frames, solid rectangles and solid polygons. 
+Arbitrary text labels can be input with the keyboard. Line and fill type
+ and color can be selected as well as the cursor type. Objects can be 
+either drawn or erased. The whole artwork can be sent to the internal 
+printer or saved/loaded to/from mass storage at any time (of course in 
+an uncompressed format...). Note that color primarily refers to the 
+9845C, however &lt;k8&gt; is used to activate the (single) color on 
+monochrome displays whereas SHIFT+&lt;k8&gt; selects the erase mode.</p>
+      <p align="center"><img src="9845%20Mouse%20Project_files/mouse-demo-menu.jpg" alt="Mouse Graphics Demo Menu" width="600" height="400" border="1"></p>
+      <p align="center"><strong>Mouse Graphics Demo Help Screen on a 9845C</strong></p>
+      <p>Lines are always drawn from the last position to the position 
+where the next left mouse button click points to. If you need to set a 
+new starting point, click to the position of this new starting point 
+with the right mouse button.</p>
+      <p>When using the text drawing feature, simply hit the &lt;TAB&gt;
+ key, then klick at the position where the text should be drawn, and 
+finish the text with &lt;CONT&gt;. Different character sizes can be 
+selected before with the keys "1" for smallest size up to "9" for 
+largest size.</p>
+      <p>Due to the limited graphics perfomance of the 9845B and the 
+lack of a hardware erase function on the 9845C, there is no eraser, 
+however both a selected area and the the whole screen can be cleared. 
+Finally, there is a special help screen with a summary of the used 
+function keys which can be activated with the &lt;HOME&gt; key.</p>
+      <p align="center"><img src="9845%20Mouse%20Project_files/polygon-editor.jpg" alt="Polygon Editor" width="600" height="400"></p>
+      <p align="center"><strong>Simple 3D Scene modelled in the Mouse Demo Polygon Mode (with Color Palette on)</strong></p>
+      <p>Within the canvas, color selection on a 9845C (or monochrome 
+shades for enhanced graphics) for draw operations can be performed also 
+with the softkeys and fill operations with a color palette (press 
+&lt;DEL LN&gt; to show/hide palette). Once the palette is visible, you 
+can chose the appropriate fill color shade by cklicking in the three 
+selectors, one for hue, one for saturation and one for luminance. Every 
+selection is previewed in a color selection field as the leftmost 
+element of the palette. Click into the color selection field to chose 
+the current color shade as "AREA COLOR" for subsequent fill operations, 
+or press &lt;DEL LN&gt; again to cancel the selection.</p>
+      <p align="left">The palette is also an example for how to 'pop up'
+ controls without destroying the underlying image. During program 
+initialization, the palette is drawn on a hidden canvas, then this 
+canvas is copied with GSTORE into an integer array. Each time the 
+palette is shown, first the overlapping part of the current image is 
+saved with GSTORE into a temporary buffer, then the palette array is 
+made visible with a GLOAD operation on the palette array. Once the 
+selection has been made, the original image is restored with a GLOAD on 
+the temporary buffer. This works fast enough to show immediate response.</p>
+      <p align="center"><img src="9845%20Mouse%20Project_files/palette.jpg" alt="Palette" width="700" height="140"></p>
+      <p align="center"><strong>Mouse Demo Fill Color Selection with HSL-Palette</strong></p>
+      <p>The save and load feature for graphics supports both fast saves
+ (BDAT files) and standard saves (DATA files). 'Fast saves' consumes 
+only half the disk space and work five times as fast as the 'standard 
+save', therefore this is the recommended way. However, fast saves are 
+only possible on disk media, so if you want to save to tapes, you'll 
+have to use the standard save function.</p>
+      <p align="center"><img src="9845%20Mouse%20Project_files/loaded-bitmap.jpg" alt="Loaded Bitmap" width="600" height="400"></p>
+      <p align="center"><strong>Color Bitmap loaded within the Mouse Graphics Demo on a 9845C</strong></p>
+      <p>Once saved and transferred to PC, both file types can be 
+converted to standard Windows BMP bitmap files with the Bmpconvert 
+program from the <em><a href="https://www.hp9845.net/9845/projects/utilities/index.html#bmpconvert">9845 Utilities Project</a></em>.
+ Also, a standard BMP file can be converted to either a BDAT or DATA 
+file, transferred to the 9845 and then loaded with the MSDEMO program. 
+The above screen shot is an impressive example on how far the 
+capabilities of the 9845C color system go. It has been produced by 
+simply converting a standard Windows bitmap into the 9845C save format, 
+which is then loaded in the mouse demo application. See the <em><a href="https://www.hp9845.net/9845/tutorials/bitmaps/screendumps/9845cdemo/index.php">9845C demo screen dump gallery</a></em> for some more examples.</p>
+      <p>Since the 9845C is capable of displaying up to eight primary 
+colors, dithering with a special color palette is necessary before 
+applying Bmpconvert on the BMP image (Bmpconvert can do a color 
+reduction, but no dithering). The 8 entry color palette needed for 
+dithering with a conventional image editor like Photoshop should hold 
+the eight primary colors black, blue, cyan, green, yellow, red, magenta,
+ and white.</p>
+      <p>Note that color graphics will be saved into three parts of approximately the same size. See the <em><a href="https://www.hp9845.net/9845/tutorials/bitmaps/index.html">Tutorial on Using Bitmaps</a></em> for more information.</p>
+      <p>Solid polygons are drawn using the 'MAT PLOT' feature, which is
+ available for enhanced and color graphics only. Circles, as well as 
+"rubber bands" are not used in the demo program.</p>
+      <p>Have fun and send me some of your favorite creations. Here is a first try (note the mouse cursor at the upper right corner...):</p>
+      <p align="center"><img src="9845%20Mouse%20Project_files/first-try.jpg" alt="First Try" width="500" height="375" border="1"></p>
+      <p align="center"><strong>Monochrome Example on a 9845B: Something is different...</strong></p>
+      <h2><a name="downloads" id="downloads"></a>Downloads</h2>
+      <p>Click here for downloading an hpi image file with MS mouse driver and mouse graphics demo, as well as the program listings:</p>
+      <table border="0" cellspacing="0" cellpadding="5" style="width:50em; margin-left:2em;">
+        <tbody><tr>
+          <td style="width:30em; border-width:0">Image with mouse driver and demo application:</td>
+          <td style="width:20em; border-width:0"><em><a href="https://www.hp9845.net/9845/downloads/hpi/9845-mouse-driver-hpi.zip">9845-mouse-driver-hpi.zip</a></em></td>
+        </tr>
+        <tr>
+          <td style="width:30em; border-width:0">Mouse driver and demo application listings:</td>
+          <td style="width:20em; border-width:0"><em><a href="https://www.hp9845.net/9845/downloads/listings/9845-mouse-driver-listings.zip">9845-mouse-driver-listings.zip</a></em></td>
+        </tr>
+      </tbody></table>
+      <p>&nbsp;</p>
+    </div>
+
+<script src="9845%20Mouse%20Project_files/footer.js" type="text/javascript"></script><div style="float:left; font-size:x-small; margin: 0 0 10px 10px; padding: 5px 0;"><a href="#top"><img src="9845%20Mouse%20Project_files/up.gif" alt="up" width="11" height="15" border="0"> Top of page </a></div><div style="float:right; font-size:x-small; margin: 0 10px 10px 0; padding: 5px 0;"><a href="#top"> Top of page <img src="9845%20Mouse%20Project_files/up.gif" alt="up" width="11" height="15" border="0"></a></div>    <div id="footer">      <p>      <a href="https://www.hp9845.net/9845/home/about.html">About</a> ·      <a href="https://www.hp9845.net/sphider/search.php">Search</a> ·      <a href="https://www.hp9845.net/9845/home/guestbook.php">Guestbook</a> ·      <a href="https://www.hp9845.net/9845/home/contact.php">Contact</a> ·      <a href="https://www.hp9845.net/9845/home/sitemap.html">Sitemap</a> ·      <a href="https://www.hp9845.net/9845/home/downloads.html">Downloads</a> ·      <a href="https://www.hp9845.net/9845/home/terms.html">Terms of Use</a>      </p>    <!-- end #footer -->    </div>    <p style="text-align: right; padding-right: 10px; margin-top:5px; font-size: x-small;">Copyright © 2010 A. Kückes</p>
+        
+        <!-- end #container -->
+
+  </div>
+    
+
+
+</body></html>

@@ -1,0 +1,198 @@
+@charset "utf-8";
+
+a:link { text-decoration:none; color: #000; }
+a:visited { text-decoration:none; color: #000; }
+a:hover { text-decoration:underline; color: #000; }
+a:active { text-decoration:underline; color: #000; }
+a:focus { text-decoration:none; font-weight: bold; color: #000; }
+
+img {border-color: #888}
+
+.imagelink { border:1px solid #E5CA67; }
+a:link .imagelink { border:1px solid #E5CA67; }
+a:hover .imagelink, a:active .imagelink {border:1px solid #0F0}
+
+body  {
+	font: 100% Verdana, Arial, Helvetica, sans-serif;
+	font-size: small;
+	background: #FFF0B7;
+	margin: 0;
+	padding: 0;
+	text-align: left;
+	color: #000000;
+}
+
+table {
+	width:100%;
+}
+
+h1 {
+	font-size: 1.7em; margin-top: 1.5em;
+}
+
+h2 {
+	font-size: 1.3em; margin-top: 2em;
+}
+
+h3 {
+	font-size: 1.1em; margin-top: 2em;
+}
+
+li {
+	margin-top: 0.5em;
+}
+
+td {
+	border-width: 1px 0 0 0;
+	border-color: #E5CA67;
+	border-style: solid;
+}
+
+.highlight {
+	background: #6F6;
+}
+
+.download {
+	border:0px
+}
+
+.hiddentable {
+	width: 80%;
+	margin-left: 3em;
+}
+
+
+.hiddentable td {
+	border-width: 0;
+}
+
+.main #container {
+	width: auto;
+	margin: 0 auto; /* Durch automatische Ränder (in Verbindung mit einer Breite) wird die Seite zentriert. */
+} 
+
+.main #header {
+	height: 100px;
+	padding-top: 0;
+	padding-right: 0;
+	padding-bottom: 0;
+	padding-left: 0;
+} 
+
+.main #gradient1 {
+	width: 100%;
+	height: 10px;
+	background-image:url(/9845/common/images/h_gradient1.png);
+	background-repeat:repeat-x;
+}
+
+.main #gradient2 {
+	clear: both;
+	width: 100%;
+	height: 15px;
+	background-image:url(/9845/common/images/h_gradient2.png);
+	background-repeat:repeat-x;
+}
+
+/* Tipps für sidebar:
+1. Da wir mit relativen Einheiten arbeiten, ist es empfehlenswert, für die Randleiste keine Auffüllung zu verwenden. Sie wird bei standardgerechten Browsern der Gesamtbreite hinzugefügt, und dies wiederum führt zu einer unbekannten tatsächlichen Breite. 
+2. Da der Randleistenwert in Gevierten (ems) angegeben wird, variiert die Breite der Randleiste je nach der Standardgröße des Textes.
+3. Zwischen der Kante des div und den darin liegenden Elementen kann ein Abstand eingefügt werden, indem Sie diesen Elementen wie in ".main #sidebar1 p" demonstriert einen linken und rechten Rand zuweisen.
+*/
+.main #sidebar_right {
+	float: right; 
+	width: 14em;
+	min-height: 30em;
+	padding: 10px 0; /* Durch die Auffüllung oben und unten entsteht in diesem div ein visueller Leerraum.  */
+	border-left-width: 1px;
+	border-left-style: solid;
+	border-left-color: #000000;
+}
+
+.main #sidebar_left {
+	font-size: smaller;
+	float: left; 
+	width: 12em;
+	min-height: 30em;
+	height: 100%;
+	margin-left: 1em;
+	padding-right: 10px;
+	border-right-width: 1px;
+	border-right-style: solid;
+	border-right-color: #000000;
+}
+
+.main #sidebar_left ul {
+	list-style-type: none;
+	font-size: x-small;
+	margin-left: 0;
+	padding-left: 0;
+}
+
+.main #sidebar_left h3, .main #sidebar_left p, .main #sidebar_right h3, .main #sidebar_right p {
+	margin-left: 1em; /* Für jedes Element, das in den seitlichen Spalten platziert wird, sollten ein linker und ein rechter Rand angegeben werden. */
+	margin-right: 1em;
+}
+
+/* Tipps für mainContent:
+1. Der Abstand zwischen mainContent und sidebar1 entsteht durch den rechten Rand des mainContent-div. Der Spaltenbereich bleibt unabhängig von der Inhaltsmenge des sidebar1-div immer gleich. Sie können diesen rechten Rand entfernen, falls der Text des #mainContent-div den Bereich von #sidebar1 füllen soll, wenn der Inhalt in #sidebar1 endet.
+2. Wenn ein Element im mainContent-div platziert wird, das zu breit ist, entsteht möglicherweise ein Float-Drop (d.h. der nicht floatende mainContent-Bereich wird unter die Randleiste verschoben). Bei einem Mischlayout (prozentbasierte Gesamtbreite und em-basierte Randleiste) kann die verfügbare Breite gegebenenfalls nicht exakt berechnet werden. Wenn die Textgröße des Benutzers über dem Durchschnitt liegt, fällt das Randleisten-div breiter aus, und dementsprechend ist im mainContent-div weniger Platz verfügbar. Sie sollten sich dieser Einschränkung bewusst sein. Dies gilt insbesondere, wenn der Kunde Inhalte mit Contribute hinzufügt.
+3. Im unten stehenden bedingten Kommentar für Internet Explorer wird die Zoom-Eigenschaft verwendet, um mainContent die Eigenschaft hasLayout zuzuweisen. Dadurch können möglicherweise verschiedene IE-spezifische Fehler verhindert werden.
+*/
+.main #mainContent_right {
+	margin: 0 15px 0 12em; /* Der Wert des linken Randes stimmt mit der Kopfzeile und der Fußzeile überein, d.h. die linke Seite des Dokuments ist einheitlich ausgerichtet. */
+} 
+
+.main #mainContent_left {
+	margin: 0 15em 0 15px; /* Der Wert des linken Randes stimmt mit der Kopfzeile und der Fußzeile überein, d.h. die linke Seite des Dokuments ist einheitlich ausgerichtet. */
+	background-image: url(/9845/images/9845_background.png);
+	background-repeat: no-repeat;
+	background-position: center;
+} 
+
+.main #footer { 
+	padding: 0 10px; /* Diese Auffüllung entspricht der linksbündigen Ausrichtung der Elemente in den divs, die darunter erscheinen. */
+	font-size: x-small;
+	text-align: center;
+	margin-left: 8px;
+	margin-right: 8px;
+	border-top-width: 1px;
+	border-bottom-width: 1px;
+	border-top-style: solid;
+	border-bottom-style: solid;
+} 
+
+.main #footer p {
+	margin: 0; /* Wenn Sie die Ränder des ersten Elements in der Fußzeile auf 0 einstellen, können Sie unerwartete Abstände zwischen divs vermeiden. */
+	padding: 10px 0; /* Durch die Verwendung der Auffüllung bei diesem Element entsteht genau wie bei einem Rand ein Leerraum, aber ohne die potenziellen Abstandsprobleme. */
+}
+
+.feature {
+	width: auto;
+	margin-left: 10px;
+	margin-right: 10px;
+	height: 10em;
+	border-left-width: 1px;
+	border-left-style: solid;
+	border-left-color: #FFF;
+	border-right-width: 1px;
+	border-right-style: solid;
+	border-right-color: #CCC;
+}
+
+/* Verschiedene wieder verwertbare Klassen */
+.fltrt { /* Mit dieser Klasse können Sie ein Element auf der Seite nach rechts fließen lassen. Das floatende Element muss vor dem Element stehen, neben dem es auf der Seite erscheinen soll. */
+	float: right;
+	margin-left: 8px;
+}
+.fltlft { /* Mit dieser Klasse können Sie ein Element auf der Seite nach links fließen lassen. */
+	float: left;
+	margin-right: 8px;
+}
+.clearfloat { /* Diese Klasse sollte in einem div- oder break-Element platziert werden und das letzte Element vor dem Schließen eines Containers sein, der wiederum einen vollständigen Float enthalten sollte. */
+	clear:both;
+	height:0;
+	font-size: 1px;
+	line-height: 0px;
+}	
+
