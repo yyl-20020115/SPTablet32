@@ -128,7 +128,6 @@ void CSPTablet32Dlg::onReadEvent(const char* portName, unsigned int readBufferLe
 		{
 			int recLen = this->Port.readData(data, readBufferLen);
 			if (recLen > 0) {
-				this->Mutex.lock();
 				{
 					this->Buffer += (char*)data;
 					size_t p = 0;
@@ -141,7 +140,6 @@ void CSPTablet32Dlg::onReadEvent(const char* portName, unsigned int readBufferLe
 						}
 					}
 				}
-				this->Mutex.unlock();
 			}
 
 			delete[] data;

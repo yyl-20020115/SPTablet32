@@ -25,9 +25,10 @@ public:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
 public:
 	virtual void onReadEvent(const char* portName, unsigned int readBufferLen);
-	virtual void onProcessPacket(const std::basic_string<unsigned char>& Buffer, unsigned int& shift);
+	virtual size_t onProcessPacket(const char* Buffer, size_t length);
 protected:
-	
+	UINT onSendInput(int dx, int dy, bool left, bool right);
+
 	void UpdateCommPortsList();
 
 // 实现
