@@ -152,9 +152,13 @@ size_t CSPTablet32Dlg::onProcessPacket(const char* buffer, size_t length)
 {
 
 	//microsoft mouse protocol :
-	//BYTE 0   1  1  L  R  Y7 Y6 X7 X6
-	//BYTE 1   0  0  X5 X4 X3 X2 X1 X0
-	//BYTE 2   0  0  Y5 Y4 Y3 Y2 Y1 Y0
+
+	// 7BITS
+	// BYTE 0   0  1  L  R  Y7 Y6 X7 X6
+	// BYTE 1   0  0  X5 X4 X3 X2 X1 X0
+	// BYTE 2   0  0  Y5 Y4 Y3 Y2 Y1 Y0
+
+
 	size_t i = 0;
 	for (i = 0; i < length - 2; i++) {
 		char bc = buffer[i + 0];
