@@ -8,9 +8,62 @@
 #include "SPTablet32Dlg.h"
 #include "afxdialogex.h"
 #include "SPTablet32API.h"
+#include <algorithm>
+
+#define WM_SHOW_TASK 0x400
+#define EXIT_MENU_ITEM_ID 0x300
+#define UM_NOTIFYICONDATA 0x200
+#define ID_REFRESH_TIMER 0x100
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+static void GetSerialPorts(std::vector<int>& ports, DWORD maxlen = 1ULL << 20)
+{
+	//Make sure we clear out any elements which may already be in the array
+	ports.clear();
+	//Use QueryDosDevice to look for all devices of the form COMx. This is a better
+	//solution as it means that no ports have to be opened at all.
+	TCHAR* szDevices = new TCHAR[maxlen];
+	if (szDevices != nullptr) {
+		memset(szDevices, 0, maxlen * sizeof(TCHAR));
+
+		DWORD dwChars = QueryDosDevice(NULL, szDevices, maxlen);
+		if (dwChars)
+		{
+			int i = 0;
+
+			for (; szDevices != nullptr;)
+			{
+				//Get the current device name
+				TCHAR* pszCurrentDevice = &szDevices[i];
+
+				//If it looks like "COMX" then
+				//add it to the array which will be returned
+				size_t nLen = _tcslen(pszCurrentDevice);
+				if (nLen > 3 && _tcsnicmp(pszCurrentDevice, _T("COM"), 3) == 0)
+				{
+					//Work out the port number
+					int nPort = _ttoi(&pszCurrentDevice[3]);
+					ports.push_back(nPort);
+				}
+
+				// Go to next NULL character
+				while (szDevices[i] != _T('\0'))
+					i++;
+
+				// Bump pointer to the next string
+				i++;
+
+				// The list is double-NULL terminated, so if the character is
+				// now NULL, we're at the end
+				if (szDevices[i] == _T('\0'))
+					break;
+			}
+		}
+		delete[] szDevices;
+	}
+	std::sort(ports.begin(), ports.end());
+}
 
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
@@ -54,7 +107,7 @@ CSPTablet32Dlg::CSPTablet32Dlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_SPTABLET32_DIALOG, pParent)
 	, Port()
 	, Buffer()
-	, Mutex()
+	, m_NotifyIconData()
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -76,20 +129,17 @@ void CSPTablet32Dlg::onReadEvent(const char* portName, unsigned int readBufferLe
 		{
 			int recLen = this->Port.readData(data, readBufferLen);
 			if (recLen > 0) {
-				this->Mutex.lock();
+				this->Buffer += (char*)data;
+				size_t p = 0;
+				while (this->Buffer.size() >= PacketLength
+					&& ((size_t)-1) != (p = this->onProcessPacket(this->Buffer.c_str(), this->Buffer.size())))
 				{
-					this->Buffer += (char*)data;
-					size_t p = 0;
-					while (this->Buffer.size()>=PacketLength&&((size_t)-1) != (p = this->onProcessPacket(this->Buffer.c_str(), this->Buffer.size())))
-					{
-						this->Buffer = this->Buffer.substr(p);
-						if (this->Buffer.size() == 0) break;
-						if (this->Buffer.size() >= PacketLength) {
-							this->Buffer = this->Buffer.substr(PacketLength);
-						}
+					this->Buffer = this->Buffer.substr(p);
+					if (this->Buffer.size() == 0) break;
+					if (this->Buffer.size() >= PacketLength) {
+						this->Buffer = this->Buffer.substr(PacketLength);
 					}
 				}
-				this->Mutex.unlock();
 			}
 
 			delete[] data;
@@ -114,14 +164,11 @@ size_t CSPTablet32Dlg::onProcessPacket(const char* buffer, size_t length)
 			&& (by & 0b11000000) == 0b10000000
 			)
 		{
-			//empty frame
-			if (bx == (char)0x80 && by == (char)0x80) return i;
-
-			bool left =  (bc & 0b00100000) != 0;
+			bool left = (bc & 0b00100000) != 0;
 			bool right = (bc & 0b00010000) != 0;
 
-			int dx = (char)((bx&0b01111111) | (bc & 0b00000011) << 6);
-			int dy = (char)((by&0b01111111) | (bc & 0b00001100) << 4);
+			int dx = (char)((bx & 0b01111111) | (bc & 0b00000011) << 6);
+			int dy = (char)((by & 0b01111111) | (bc & 0b00001100) << 4);
 			left = false;
 			right = false;
 			onSendInput(dx, dy, left, right);
@@ -158,20 +205,70 @@ UINT CSPTablet32Dlg::onSendInput(int dx, int dy, bool left, bool right)
 
 	input.mi.dx = dx;
 	input.mi.dy = dy;
-	//static int index = 0;
-	//CString text;
-	//text.Format(_T("index = %08d, dx=%08d,dy=%08d,left=%d,right=%d\r\n"),index++, dx, dy, left, right);
-	//OutputDebugString(text);
+	static int index = 0;
+	CString text;
+	text.Format(_T("index = %08d, dx=%08d,dy=%08d,left=%d,right=%d\r\n"), index++, dx, dy, left, right);
+	OutputDebugString(text);
 
-	ret =SendInput(1, &input, sizeof(INPUT));
+	//ret =SendInput(1, &input, sizeof(INPUT));
 	return ret;
 }
 
+void CSPTablet32Dlg::UpdateCommPortsList()
+{
+	std::vector<int> listed_ports;
+	std::vector<int> found_ports;
+	GetSerialPorts(found_ports);
+	for (size_t i = 0; i < this->PortsList.GetCount(); i++) {
+		DWORD_PTR p = this->PortsList.GetItemData(i);
+		listed_ports.push_back(p);
+	}
+	std::sort(listed_ports.begin(), listed_ports.end());
+	bool eq = found_ports.size() > 0
+		&& listed_ports.size()
+		== found_ports.size()
+		&& std::equal(
+			std::begin(listed_ports),
+			std::end(listed_ports),
+			std::begin(found_ports));
+	if (!eq) {
+		this->PortsList.SetCurSel(-1);
+		this->PortsList.Clear();
+		for (size_t i = 0; i < found_ports.size(); i++) {
+			CString com_name;
+			int com_number = found_ports[i];
+			com_name.Format(_T("COM%d"), com_number);
+			int index = this->PortsList.AddString(com_name);
+			if (index >= 0) {
+				this->PortsList.SetItemData(index, com_number);
+			}
+		}
+	}
+
+	if (this->PortsList.GetCount() > 0
+		&& this->PortsList.GetCurSel() == -1) {
+		int index = 0;
+		CString text = theApp.GetProfileString(_T("Config"), _T("COMPort"), _T(""));
+		index = !text.IsEmpty() ?
+			this->PortsList.FindStringExact(-1, text) : 0;
+		this->PortsList.SetCurSel(index >= 0 ? index : 0);
+	}
+	//do not enable window if no port at all
+	this->PortsList.EnableWindow(this->PortsList.GetCount() > 0);
+
+}
+
 BEGIN_MESSAGE_MAP(CSPTablet32Dlg, CDialogEx)
+	ON_MESSAGE(WM_SHOW_TASK, OnShowTask)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BUTTON_TEST, &CSPTablet32Dlg::OnBnClickedButtonStart)
+	ON_WM_TIMER()
+	ON_BN_CLICKED(IDCANCEL, &CSPTablet32Dlg::OnBnClickedCancel)
+	ON_BN_CLICKED(IDC_BUTTON_HIDE, &CSPTablet32Dlg::OnBnClickedButtonHide)
+	ON_WM_CLOSE()
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
@@ -206,7 +303,20 @@ BOOL CSPTablet32Dlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
-	// TODO: 在此添加额外的初始化代码
+	this->UpdateCommPortsList();
+	this->SetTimer(ID_REFRESH_TIMER, 1000, NULL);
+
+	m_NotifyIconData.cbSize = sizeof(m_NotifyIconData);
+	m_NotifyIconData.hWnd = m_hWnd;
+	m_NotifyIconData.uID = UM_NOTIFYICONDATA;
+	m_NotifyIconData.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
+	m_NotifyIconData.uCallbackMessage = WM_SHOW_TASK;
+	m_NotifyIconData.hIcon = m_hIcon;
+	//这里的wcscpy_s为宽字符集函数，对应的C函数为strcpy_s
+	wcscpy_s(m_NotifyIconData.szTip, 64, _T("SPTable32"));
+
+	//调用此函数来显示托盘
+	Shell_NotifyIcon(NIM_ADD, &m_NotifyIconData);
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -260,25 +370,69 @@ HCURSOR CSPTablet32Dlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+LRESULT CSPTablet32Dlg::OnShowTask(WPARAM wParam, LPARAM lParam)
+{
+	if (wParam == UM_NOTIFYICONDATA)
+	{
+		switch (lParam) {
+		case WM_LBUTTONDOWN:
+		{
+			this->ShowWindow(SW_SHOW);
+		}
+		break;
+		case WM_RBUTTONDOWN:
+		{
+			POINT p = { 0 };
+
+			::GetCursorPos(&p); // 得到鼠标位置
+
+			CMenu menu;
+
+			menu.CreatePopupMenu();
+			menu.AppendMenu(MF_STRING, EXIT_MENU_ITEM_ID, _T("关闭(&X)"));
+
+			if (menu.TrackPopupMenu(TPM_LEFTALIGN, p.x, p.y, this)) {
+
+			}
+
+			HMENU hmenu = menu.Detach();
+
+			menu.DestroyMenu();
+		}
+		break;
+		}
+	}
+	return LRESULT();
+}
+
 void CSPTablet32Dlg::OnBnClickedButtonStart()
 {
 	if (this->Port.isOpen()) {
-		this->ButtonStart.SetWindowText(_T("开始"));
+		this->Port.clearError();
+		this->Port.flushBuffers();
 		this->Port.close();
-		this->Port.disconnectReadEvent();
 		this->PortsList.EnableWindow(TRUE);
+		this->ButtonStart.SetWindowText(_T("启动"));
 	}
-	else
+	else if (this->PortsList.GetCount() > 0)
 	{
-		CString COM = _T("COM2");
+		int SelIndex = this->PortsList.GetCurSel();
+		if (SelIndex < 0) SelIndex = 0;
+		INT_PTR PortNumber = this->PortsList.GetItemData(SelIndex);
+
+		CString COM;
+		COM.Format(_T("COM%d"), (int)PortNumber);
 		CString COMPath = _T("\\\\.\\") + COM;
 
 		tablet_status status = setup_tablet(COMPath, microsoft_mouse_protocol);
-		if (status < 0) {
-			MessageBox(_T("SPTablet is NOT initialized as a mouse!"), _T("SPTablet"));
-		}
-		if (status > 0)
+		if (status <= 0)
 		{
+			MessageBox(_T("SPTablet32 未能开启鼠标模拟功能!"), _T("SPTablet32"));
+		}
+		else
+		{
+			theApp.WriteProfileString(_T("Config"), _T("COMPort"), COM);
+
 			this->Port.connectReadEvent(this);
 			//1200,8,N,1
 			this->Port.init(
@@ -287,14 +441,62 @@ void CSPTablet32Dlg::OnBnClickedButtonStart()
 				itas109::Parity(itas109::Parity::ParityNone),
 				itas109::DataBits(itas109::DataBits::DataBits8),
 				itas109::StopBits(itas109::StopBits::StopOne),
-				itas109::FlowControl::FlowHardware);
+				itas109::FlowControl::FlowHardware, 48);
 			if (this->Port.open())
 			{
-				this->ButtonStart.SetWindowText(_T("停止"));
-
 				this->PortsList.EnableWindow(FALSE);
+				this->ButtonStart.SetWindowText(_T("停止"));
 			}
-
+			else {
+				MessageBox(_T("SPTablet32 无法启动!"), _T("SPTablet32"));
+			}
 		}
 	}
+}
+
+BOOL CSPTablet32Dlg::OnCommand(WPARAM wParam, LPARAM lParam)
+{
+	if (wParam == EXIT_MENU_ITEM_ID) {
+		this->DestroyWindow();
+	}
+	return CDialogEx::OnCommand(wParam,lParam);
+}
+
+
+void CSPTablet32Dlg::OnTimer(UINT_PTR nIDEvent)
+{
+	switch (nIDEvent) {
+	case ID_REFRESH_TIMER:
+		this->UpdateCommPortsList();
+		break;
+
+	}
+
+	__super::OnTimer(nIDEvent);
+}
+
+
+void CSPTablet32Dlg::OnBnClickedCancel()
+{
+}
+
+
+void CSPTablet32Dlg::OnBnClickedButtonHide()
+{
+	this->ShowWindow(SW_HIDE);
+}
+
+
+void CSPTablet32Dlg::OnClose()
+{
+	this->ShowWindow(SW_HIDE);
+	__super::OnClose();
+}
+
+
+void CSPTablet32Dlg::OnDestroy()
+{
+	Shell_NotifyIcon(NIM_DELETE, &m_NotifyIconData);
+
+	__super::OnDestroy();
 }

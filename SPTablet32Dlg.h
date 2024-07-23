@@ -25,21 +25,30 @@ public:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
 public:
 	virtual void onReadEvent(const char* portName, unsigned int readBufferLen);
-	virtual size_t onProcessPacket(const char* buffer, size_t length);
-	virtual UINT onSendInput(int dx, int dy, bool left, bool right);
+	virtual size_t onProcessPacket(const char* Buffer, size_t length);
+protected:
+	UINT onSendInput(int dx, int dy, bool left, bool right);
+
+	void UpdateCommPortsList();
+
 // 实现
 protected:
 	HICON m_hIcon;
 	itas109::CSerialPort Port;
 	std::string Buffer;
+	NOTIFYICONDATA m_NotifyIconData;
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
+	LRESULT OnShowTask(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedButtonStart();
+
+	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam) override;
+
 	CComboBox PortsList;
 
 	bool last_left = false;
@@ -47,6 +56,11 @@ public:
 	bool last_right = false;
 	int last_x = 0;
 	int last_y = 0;
-	std::mutex Mutex;
+
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnBnClickedCancel();
+	afx_msg void OnBnClickedButtonHide();
+	afx_msg void OnClose();
+	afx_msg void OnDestroy();
 	CButton ButtonStart;
 };
