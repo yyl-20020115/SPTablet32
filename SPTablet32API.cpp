@@ -32,6 +32,8 @@ tablet_status setup_tablet(LPCTSTR com_port, mouse_protocol mouse_type, bool as_
 		COMMTIMEOUTS cmo = { 0 };
 		
 		done &= 0!=GetCommTimeouts(hComm, &cmo);
+		cmo.ReadIntervalTimeout = 5000;
+		//2ms timeout for ReadFile
 		cmo.ReadTotalTimeoutConstant = 2;
 		done &= 0!=SetCommTimeouts(hComm, &cmo);
 
@@ -44,6 +46,7 @@ tablet_status setup_tablet(LPCTSTR com_port, mouse_protocol mouse_type, bool as_
 
 		//if ((read_mcr(hComm)&0x3) ==0)
 		//force reset tablet
+		for(int m = 0;m<3;m++)
 		{
 			write_mcr(hComm, true, true);
 			delay_ms(28);
@@ -60,7 +63,7 @@ tablet_status setup_tablet(LPCTSTR com_port, mouse_protocol mouse_type, bool as_
 			write_data(hComm, 0x3F);
 			if (read_data_sp(hComm, &ch))break;
 		}
-		if (retries == 256) {
+		if (retries == 256) { //145~148 retries is ok
 			status = not_responding;
 			done = false;
 		}

@@ -6,6 +6,7 @@
 #include <CSerialPort/SerialPort.h>
 #include <vector>
 #include <string>
+#include <mutex>
 // CSPTablet32Dlg 对话框
 class CSPTablet32Dlg : public CDialogEx, public itas109::CSerialPortListener
 {
@@ -24,8 +25,8 @@ public:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
 public:
 	virtual void onReadEvent(const char* portName, unsigned int readBufferLen);
-	virtual void onProcessPacket(const std::basic_string<unsigned char>& Buffer, unsigned int& shift);
-
+	virtual size_t onProcessPacket(const char* buffer, size_t length);
+	virtual UINT onSendInput(int dx, int dy, bool left, bool right);
 // 实现
 protected:
 	HICON m_hIcon;
@@ -46,5 +47,6 @@ public:
 	bool last_right = false;
 	int last_x = 0;
 	int last_y = 0;
-
+	std::mutex Mutex;
+	CButton ButtonStart;
 };

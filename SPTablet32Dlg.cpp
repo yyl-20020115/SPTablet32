@@ -54,6 +54,7 @@ CSPTablet32Dlg::CSPTablet32Dlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_SPTABLET32_DIALOG, pParent)
 	, Port()
 	, Buffer()
+	, Mutex()
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -62,6 +63,7 @@ void CSPTablet32Dlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_COMBO_PORTS_LIST, PortsList);
+	DDX_Control(pDX, IDC_BUTTON_START, ButtonStart);
 }
 
 void CSPTablet32Dlg::onReadEvent(const char* portName, unsigned int readBufferLen)
@@ -74,21 +76,20 @@ void CSPTablet32Dlg::onReadEvent(const char* portName, unsigned int readBufferLe
 		{
 			int recLen = this->Port.readData(data, readBufferLen);
 			if (recLen > 0) {
-				CString all;
-				for (int i = 0; i < recLen; i++) {
-					CString text;
-					text.Format(_T("%02X "), data[i]);
-					all += text;
+				this->Mutex.lock();
+				{
+					this->Buffer += (char*)data;
+					size_t p = 0;
+					while (((size_t)-1) != (p = this->onProcessPacket(this->Buffer.c_str(), this->Buffer.size())))
+					{
+						this->Buffer = this->Buffer.substr(p);
+						if (this->Buffer.size() == 0) break;
+						if (this->Buffer.size() >= PacketLength) {
+							this->Buffer = this->Buffer.substr(PacketLength);
+						}
+					}
 				}
-				OutputDebugString(all + _T("\r\n"));
-
-				this->Buffer += (char*)data;
-				unsigned int shift = 0;
-				//while (this->Buffer.size() >= 2 * PacketLength) {
-				//	auto part = this->Buffer.substr(0, PacketLength);
-				//	//this->onProcessPacket(part,shift);
-				//	this->Buffer = this->Buffer.substr(shift + PacketLength);
-				//}
+				this->Mutex.unlock();
 			}
 
 			delete[] data;
@@ -96,48 +97,50 @@ void CSPTablet32Dlg::onReadEvent(const char* portName, unsigned int readBufferLe
 	}
 }
 
-void CSPTablet32Dlg::onProcessPacket(const std::basic_string<unsigned char>& Buffer, unsigned int& shift)
+size_t CSPTablet32Dlg::onProcessPacket(const char* buffer, size_t length)
 {
-	//mouse system mouse protocol :
-	//BYTE 0   1  0  0  0  0  L  M  R     80
-	//BYTE 1   X7 X6 X5 X4 X3 X2 X1 X0    80
-	//BYTE 2   Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0    00
-	//BYTE 3   X7 X6 X5 X4 X3 X2 X1 X0    E0
-	//BYTE 4   Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0    80
 
 	//microsoft mouse protocol :
 	//BYTE 0   1  1  L  R  Y7 Y6 X7 X6
 	//BYTE 1   0  0  X5 X4 X3 X2 X1 X0
 	//BYTE 2   0  0  Y5 Y4 Y3 Y2 Y1 Y0
+	size_t i = 0;
+	for (i = 0; i < length - 2; i++) {
+		char bc = buffer[i + 0];
+		char bx = buffer[i + 1];
+		char by = buffer[i + 2];
+		if ((bc & 0b11000000) == 0b11000000
+			&& (bx & 0b11000000) == 0b10000000
+			&& (by & 0b11000000) == 0b10000000
+			)
+		{
+			//empty frame
+			if (bx == (char)0x80 && by == (char)0x80) return i;
 
+			bool left =  (bc & 0b00100000) != 0;
+			bool right = (bc & 0b00010000) != 0;
+
+			int dx = (char)(bx | (bc & 0b00000011) << 6);
+			int dy = (char)(by | (bc & 0b00001100) << 4);
+
+			onSendInput(dx, dy, left, right);
+			return i;
+		}
+	}
+
+	return (size_t)(-1);
+}
+
+UINT CSPTablet32Dlg::onSendInput(int dx, int dy, bool left, bool right)
+{
 	UINT ret = 0;
 	INPUT input = { 0 };
-
-	size_t i = 0;
-	for(i = 0;i<3;i++)
-	{
-		//found header
-		if ((Buffer[i] & 0b11000000) == 0b11000000) {
-			break;
-		}
-		shift++;
-	}
-	unsigned char bc = Buffer[i + 0];
-	unsigned char bx = Buffer[i + 1];
-	unsigned char by = Buffer[i + 2];
-
-	bool left =  (bc & 0b00100000) != 0;
-	bool middle = false;// (btx & 0b00000010) != 0;
-	bool right = (bc & 0b00010000) != 0;
-
-	int dx = bx | (bc & 0b00000011) << 6;
-	int dy = by | (bc & 0b00001100) << 4;
-
 	input.type = INPUT_MOUSE;
 	input.mi.mouseData = 0;
 
-	if (dx != last_x || dy != last_y) {
-		input.mi.dwFlags |= MOUSEEVENTF_MOVE| MOUSEEVENTF_ABSOLUTE;
+	//if (dx != last_x || dy != last_y) 
+	{
+		input.mi.dwFlags |= MOUSEEVENTF_MOVE;
 	}
 
 	if (!last_left && left)
@@ -146,12 +149,6 @@ void CSPTablet32Dlg::onProcessPacket(const std::basic_string<unsigned char>& Buf
 		input.mi.dwFlags |= MOUSEEVENTF_LEFTUP;
 	last_left = left;
 
-
-	if (!last_middle && middle)
-		input.mi.dwFlags |= MOUSEEVENTF_MIDDLEDOWN;
-	else if (last_middle && !middle)
-		input.mi.dwFlags |= MOUSEEVENTF_MIDDLEUP;
-	last_middle = middle;
 	if (!last_right && right)
 		input.mi.dwFlags |= MOUSEEVENTF_RIGHTDOWN;
 	else if (last_right && !right)
@@ -160,9 +157,13 @@ void CSPTablet32Dlg::onProcessPacket(const std::basic_string<unsigned char>& Buf
 
 	input.mi.dx = dx;
 	input.mi.dy = dy;
+	static int index = 0;
+	CString text;
+	text.Format(_T("index = %08d, dx=%08d,dy=%08d,left=%d,right=%d\r\n"),index++, dx, dy, left, right);
+	OutputDebugString(text);
 
-	ret = SendInput(1, &input, sizeof(INPUT));
-
+	//ret =SendInput(1, &input, sizeof(INPUT));
+	return ret;
 }
 
 BEGIN_MESSAGE_MAP(CSPTablet32Dlg, CDialogEx)
@@ -260,24 +261,24 @@ HCURSOR CSPTablet32Dlg::OnQueryDragIcon()
 
 void CSPTablet32Dlg::OnBnClickedButtonStart()
 {
-	if (!this->Port.isOpen())
+	if (this->Port.isOpen()) {
+		this->ButtonStart.SetWindowText(_T("开始"));
+		this->Port.close();
+		this->Port.disconnectReadEvent();
+		this->PortsList.EnableWindow(TRUE);
+	}
+	else
 	{
 		CString COM = _T("COM2");
 		CString COMPath = _T("\\\\.\\") + COM;
 
 		tablet_status status = setup_tablet(COMPath, microsoft_mouse_protocol);
-		if (status > 0) {
-			MessageBox(_T("SPTablet is initialized as a mouse!"), _T("SPTablet"));
-		}
-		else {
+		if (status < 0) {
 			MessageBox(_T("SPTablet is NOT initialized as a mouse!"), _T("SPTablet"));
 		}
 		if (status > 0)
 		{
-			if (this->Port.isOpen()) {
-				this->Port.close();
-				this->Port.disconnectReadEvent();
-			}
+			this->Port.connectReadEvent(this);
 			//1200,8,N,1
 			this->Port.init(
 				(CStringA)COM,
@@ -288,7 +289,7 @@ void CSPTablet32Dlg::OnBnClickedButtonStart()
 				itas109::FlowControl::FlowHardware, 48);
 			if (this->Port.open())
 			{
-				this->Port.connectReadEvent(this);
+				this->ButtonStart.SetWindowText(_T("停止"));
 
 				this->PortsList.EnableWindow(FALSE);
 			}
