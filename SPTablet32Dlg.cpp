@@ -223,9 +223,9 @@ void CSPTablet32Dlg::UpdateCommPortsList()
 	std::vector<int> listed_ports;
 	std::vector<int> found_ports;
 	GetSerialPorts(found_ports);
-	for (size_t i = 0; i < this->PortsList.GetCount(); i++) {
+	for (int i = 0; i < this->PortsList.GetCount(); i++) {
 		DWORD_PTR p = this->PortsList.GetItemData(i);
-		listed_ports.push_back(p);
+		listed_ports.push_back((int)p);
 	}
 	std::sort(listed_ports.begin(), listed_ports.end());
 	bool eq = found_ports.size() > 0
