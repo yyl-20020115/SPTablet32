@@ -63,4 +63,6 @@ public:
 	afx_msg void OnClose();
 	afx_msg void OnDestroy();
 	CButton ButtonStart;
+	CButton UseStandardMouse;
+	afx_msg void OnBnClickedCheckUseStandardMouse();
 };

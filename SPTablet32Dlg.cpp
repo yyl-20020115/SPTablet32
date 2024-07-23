@@ -117,6 +117,7 @@ void CSPTablet32Dlg::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_COMBO_PORTS_LIST, PortsList);
 	DDX_Control(pDX, IDC_BUTTON_START, ButtonStart);
+	DDX_Control(pDX, IDC_CHECK_USE_STANDARD_MOUSE, UseStandardMouse);
 }
 
 void CSPTablet32Dlg::onReadEvent(const char* portName, unsigned int readBufferLen)
@@ -159,9 +160,9 @@ size_t CSPTablet32Dlg::onProcessPacket(const char* buffer, size_t length)
 		char bc = buffer[i + 0];
 		char bx = buffer[i + 1];
 		char by = buffer[i + 2];
-		if ((bc & 0b11000000) == 0b11000000
-			&& (bx & 0b11000000) == 0b10000000
-			&& (by & 0b11000000) == 0b10000000
+		if ((bc & 0b11000000) == 0b01000000
+			&& (bx & 0b11000000) == 0b00000000
+			&& (by & 0b11000000) == 0b00000000
 			)
 		{
 			bool left = (bc & 0b00100000) != 0;
@@ -169,8 +170,7 @@ size_t CSPTablet32Dlg::onProcessPacket(const char* buffer, size_t length)
 
 			int dx = (char)((bx & 0b01111111) | (bc & 0b00000011) << 6);
 			int dy = (char)((by & 0b01111111) | (bc & 0b00001100) << 4);
-			left = false;
-			right = false;
+			
 			onSendInput(dx, dy, left, right);
 			return i;
 		}
@@ -205,12 +205,12 @@ UINT CSPTablet32Dlg::onSendInput(int dx, int dy, bool left, bool right)
 
 	input.mi.dx = dx;
 	input.mi.dy = dy;
-	static int index = 0;
-	CString text;
-	text.Format(_T("index = %08d, dx=%08d,dy=%08d,left=%d,right=%d\r\n"), index++, dx, dy, left, right);
-	OutputDebugString(text);
+	//static int index = 0;
+	//CString text;
+	//text.Format(_T("index = %08d, dx=%08d,dy=%08d,left=%d,right=%d\r\n"), index++, dx, dy, left, right);
+	//OutputDebugString(text);
 
-	//ret =SendInput(1, &input, sizeof(INPUT));
+	ret =SendInput(1, &input, sizeof(INPUT));
 	return ret;
 }
 
@@ -253,9 +253,10 @@ void CSPTablet32Dlg::UpdateCommPortsList()
 			this->PortsList.FindStringExact(-1, text) : 0;
 		this->PortsList.SetCurSel(index >= 0 ? index : 0);
 	}
-	//do not enable window if no port at all
-	this->PortsList.EnableWindow(this->PortsList.GetCount() > 0);
-
+	if (!this->Port.isOpen()) {
+		//do not enable window if no port at all
+		this->PortsList.EnableWindow(this->PortsList.GetCount() > 0);
+	}
 }
 
 BEGIN_MESSAGE_MAP(CSPTablet32Dlg, CDialogEx)
@@ -269,6 +270,7 @@ BEGIN_MESSAGE_MAP(CSPTablet32Dlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_HIDE, &CSPTablet32Dlg::OnBnClickedButtonHide)
 	ON_WM_CLOSE()
 	ON_WM_DESTROY()
+	ON_BN_CLICKED(IDC_CHECK_USE_STANDARD_MOUSE, &CSPTablet32Dlg::OnBnClickedCheckUseStandardMouse)
 END_MESSAGE_MAP()
 
 
@@ -317,6 +319,7 @@ BOOL CSPTablet32Dlg::OnInitDialog()
 
 	//调用此函数来显示托盘
 	Shell_NotifyIcon(NIM_ADD, &m_NotifyIconData);
+	this->UseStandardMouse.SetCheck(theApp.GetProfileInt(_T("Config"), _T("UseStandardMouse"), 0));
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -422,24 +425,27 @@ void CSPTablet32Dlg::OnBnClickedButtonStart()
 
 		CString COM;
 		COM.Format(_T("COM%d"), (int)PortNumber);
+		theApp.WriteProfileString(_T("Config"), _T("COMPort"), COM);
+
 		CString COMPath = _T("\\\\.\\") + COM;
 
-		tablet_status status = setup_tablet(COMPath, microsoft_mouse_protocol);
+		tablet_status status = reset_tablet_ok;
+		if (this->UseStandardMouse.GetCheck()==0) {
+			status = setup_tablet(COMPath, microsoft_mouse_protocol);
+		}
 		if (status <= 0)
 		{
 			MessageBox(_T("SPTablet32 未能开启鼠标模拟功能!"), _T("SPTablet32"));
 		}
 		else
 		{
-			theApp.WriteProfileString(_T("Config"), _T("COMPort"), COM);
-
 			this->Port.connectReadEvent(this);
 			//1200,8,N,1
 			this->Port.init(
 				(CStringA)COM,
 				1200,
 				itas109::Parity(itas109::Parity::ParityNone),
-				itas109::DataBits(itas109::DataBits::DataBits8),
+				itas109::DataBits(itas109::DataBits::DataBits7),
 				itas109::StopBits(itas109::StopBits::StopOne),
 				itas109::FlowControl::FlowHardware, 48);
 			if (this->Port.open())
@@ -499,4 +505,10 @@ void CSPTablet32Dlg::OnDestroy()
 	Shell_NotifyIcon(NIM_DELETE, &m_NotifyIconData);
 
 	__super::OnDestroy();
+}
+
+
+void CSPTablet32Dlg::OnBnClickedCheckUseStandardMouse()
+{
+	theApp.WriteProfileInt(_T("Config"), _T("UseStandardMouse"), this->UseStandardMouse.GetCheck());
 }
