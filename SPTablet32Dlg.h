@@ -46,6 +46,9 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedButtonStart();
+
+	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam) override;
+
 	CComboBox PortsList;
 
 	bool last_left = false;

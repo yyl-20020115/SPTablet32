@@ -11,8 +11,9 @@
 #include <algorithm>
 
 #define WM_SHOW_TASK 0x400
-#define UM_NOTIFYICONDATA 100
-#define ID_REFRESH_TIMER 100
+#define EXIT_MENU_ITEM_ID 0x300
+#define UM_NOTIFYICONDATA 0x200
+#define ID_REFRESH_TIMER 0x100
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -128,16 +129,15 @@ void CSPTablet32Dlg::onReadEvent(const char* portName, unsigned int readBufferLe
 		{
 			int recLen = this->Port.readData(data, readBufferLen);
 			if (recLen > 0) {
+				this->Buffer += (char*)data;
+				size_t p = 0;
+				while (this->Buffer.size() >= PacketLength
+					&& ((size_t)-1) != (p = this->onProcessPacket(this->Buffer.c_str(), this->Buffer.size())))
 				{
-					this->Buffer += (char*)data;
-					size_t p = 0;
-					while (((size_t)-1) != (p = this->onProcessPacket(this->Buffer.c_str(), this->Buffer.size())))
-					{
-						this->Buffer = this->Buffer.substr(p);
-						if (this->Buffer.size() == 0) break;
-						if (this->Buffer.size() >= PacketLength) {
-							this->Buffer = this->Buffer.substr(PacketLength);
-						}
+					this->Buffer = this->Buffer.substr(p);
+					if (this->Buffer.size() == 0) break;
+					if (this->Buffer.size() >= PacketLength) {
+						this->Buffer = this->Buffer.substr(PacketLength);
 					}
 				}
 			}
@@ -164,12 +164,13 @@ size_t CSPTablet32Dlg::onProcessPacket(const char* buffer, size_t length)
 			&& (by & 0b11000000) == 0b10000000
 			)
 		{
-			bool left =  (bc & 0b00100000) != 0;
+			bool left = (bc & 0b00100000) != 0;
 			bool right = (bc & 0b00010000) != 0;
 
-			int dx = (char)(bx | (bc & 0b00000011) << 6);
-			int dy = (char)(by | (bc & 0b00001100) << 4);
-
+			int dx = (char)((bx & 0b01111111) | (bc & 0b00000011) << 6);
+			int dy = (char)((by & 0b01111111) | (bc & 0b00001100) << 4);
+			left = false;
+			right = false;
 			onSendInput(dx, dy, left, right);
 			return i;
 		}
@@ -206,7 +207,7 @@ UINT CSPTablet32Dlg::onSendInput(int dx, int dy, bool left, bool right)
 	input.mi.dy = dy;
 	static int index = 0;
 	CString text;
-	text.Format(_T("index = %08d, dx=%08d,dy=%08d,left=%d,right=%d\r\n"),index++, dx, dy, left, right);
+	text.Format(_T("index = %08d, dx=%08d,dy=%08d,left=%d,right=%d\r\n"), index++, dx, dy, left, right);
 	OutputDebugString(text);
 
 	//ret =SendInput(1, &input, sizeof(INPUT));
@@ -258,7 +259,7 @@ void CSPTablet32Dlg::UpdateCommPortsList()
 }
 
 BEGIN_MESSAGE_MAP(CSPTablet32Dlg, CDialogEx)
-	ON_MESSAGE(WM_SHOW_TASK,OnShowTask)
+	ON_MESSAGE(WM_SHOW_TASK, OnShowTask)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
@@ -373,24 +374,32 @@ LRESULT CSPTablet32Dlg::OnShowTask(WPARAM wParam, LPARAM lParam)
 {
 	if (wParam == UM_NOTIFYICONDATA)
 	{
-		//左键双击托盘  显示窗口
-		if (lParam == WM_LBUTTONDOWN)
+		switch (lParam) {
+		case WM_LBUTTONDOWN:
 		{
-			//显示桌面
 			this->ShowWindow(SW_SHOW);
 		}
-		//右键单击托盘 显示托盘浮动菜单
-		if (lParam == WM_RBUTTONDOWN)
+		break;
+		case WM_RBUTTONDOWN:
 		{
-			////定义菜单，此次我们选择从资源中加载菜单
-			////资源中的0号（第一个）菜单是我们需要的
-			//CMenu* pMenu = this->GetMenu();
-			////CMenu * pMenu = this->GetMenu()->GetSubMenu(0);
-			////获得鼠标焦点
-			//CPoint point;
-			//GetCursorPos(&point);
-			////显示菜单
-			//pMenu->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, point.x, point.y, this);
+			POINT p = { 0 };
+
+			::GetCursorPos(&p); // 得到鼠标位置
+
+			CMenu menu;
+
+			menu.CreatePopupMenu();
+			menu.AppendMenu(MF_STRING, EXIT_MENU_ITEM_ID, _T("关闭(&X)"));
+
+			if (menu.TrackPopupMenu(TPM_LEFTALIGN, p.x, p.y, this)) {
+
+			}
+
+			HMENU hmenu = menu.Detach();
+
+			menu.DestroyMenu();
+		}
+		break;
 		}
 	}
 	return LRESULT();
@@ -402,28 +411,28 @@ void CSPTablet32Dlg::OnBnClickedButtonStart()
 		this->Port.clearError();
 		this->Port.flushBuffers();
 		this->Port.close();
+		this->PortsList.EnableWindow(TRUE);
+		this->ButtonStart.SetWindowText(_T("启动"));
 	}
-	else if(this->PortsList.GetCount()>0)
+	else if (this->PortsList.GetCount() > 0)
 	{
 		int SelIndex = this->PortsList.GetCurSel();
 		if (SelIndex < 0) SelIndex = 0;
 		INT_PTR PortNumber = this->PortsList.GetItemData(SelIndex);
 
 		CString COM;
-		COM.Format(_T("COM%d"),(int)PortNumber);
+		COM.Format(_T("COM%d"), (int)PortNumber);
 		CString COMPath = _T("\\\\.\\") + COM;
 
 		tablet_status status = setup_tablet(COMPath, microsoft_mouse_protocol);
-		if (status <= 0) 
+		if (status <= 0)
 		{
-			MessageBox(_T("SPTablet is NOT initialized as a mouse!"), _T("SPTablet"));
+			MessageBox(_T("SPTablet32 未能开启鼠标模拟功能!"), _T("SPTablet32"));
 		}
-		if (status > 0)
+		else
 		{
-			if (this->Port.isOpen()) {
-				this->Port.close();
-				this->Port.disconnectReadEvent();
-			}
+			theApp.WriteProfileString(_T("Config"), _T("COMPort"), COM);
+
 			this->Port.connectReadEvent(this);
 			//1200,8,N,1
 			this->Port.init(
@@ -436,9 +445,21 @@ void CSPTablet32Dlg::OnBnClickedButtonStart()
 			if (this->Port.open())
 			{
 				this->PortsList.EnableWindow(FALSE);
+				this->ButtonStart.SetWindowText(_T("停止"));
+			}
+			else {
+				MessageBox(_T("SPTablet32 无法启动!"), _T("SPTablet32"));
 			}
 		}
 	}
+}
+
+BOOL CSPTablet32Dlg::OnCommand(WPARAM wParam, LPARAM lParam)
+{
+	if (wParam == EXIT_MENU_ITEM_ID) {
+		this->DestroyWindow();
+	}
+	return CDialogEx::OnCommand(wParam,lParam);
 }
 
 
