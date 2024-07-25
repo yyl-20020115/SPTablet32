@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include <mutex>
+#include "SPTablet32API.h"
 // CSPTablet32Dlg 对话框
 class CSPTablet32Dlg : public CDialogEx, public itas109::CSerialPortListener
 {
@@ -31,6 +32,8 @@ protected:
 
 	void UpdateCommPortsList();
 
+
+	tablet_status DoActivate(CString& COM);
 // 实现
 protected:
 	HICON m_hIcon;
@@ -65,4 +68,5 @@ public:
 	CButton ButtonStart;
 	CButton UseStandardMouse;
 	afx_msg void OnBnClickedCheckUseStandardMouse();
+	afx_msg void OnBnClickedButtonActivate();
 };

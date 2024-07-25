@@ -263,6 +263,27 @@ void CSPTablet32Dlg::UpdateCommPortsList()
 	}
 }
 
+
+tablet_status CSPTablet32Dlg::DoActivate(CString& COM)
+{
+	tablet_status status = unknown;
+
+	if (this->PortsList.GetCount() > 0)
+	{
+		int SelIndex = this->PortsList.GetCurSel();
+		if (SelIndex < 0) SelIndex = 0;
+		INT_PTR PortNumber = this->PortsList.GetItemData(SelIndex);
+
+		COM.Format(_T("COM%d"), (int)PortNumber);
+		theApp.WriteProfileString(_T("Config"), _T("COMPort"), COM);
+
+		CString COMPath = _T("\\\\.\\") + COM;
+
+		status = setup_tablet(COMPath, microsoft_mouse_protocol);;
+	}
+	return status;
+}
+
 BEGIN_MESSAGE_MAP(CSPTablet32Dlg, CDialogEx)
 	ON_MESSAGE(WM_SHOW_TASK, OnShowTask)
 	ON_WM_SYSCOMMAND()
@@ -275,6 +296,7 @@ BEGIN_MESSAGE_MAP(CSPTablet32Dlg, CDialogEx)
 	ON_WM_CLOSE()
 	ON_WM_DESTROY()
 	ON_BN_CLICKED(IDC_CHECK_USE_STANDARD_MOUSE, &CSPTablet32Dlg::OnBnClickedCheckUseStandardMouse)
+	ON_BN_CLICKED(IDC_BUTTON_ACTIVATE, &CSPTablet32Dlg::OnBnClickedButtonActivate)
 END_MESSAGE_MAP()
 
 
@@ -421,22 +443,14 @@ void CSPTablet32Dlg::OnBnClickedButtonStart()
 		this->PortsList.EnableWindow(TRUE);
 		this->ButtonStart.SetWindowText(_T("启动"));
 	}
-	else if (this->PortsList.GetCount() > 0)
+	else 
 	{
-		int SelIndex = this->PortsList.GetCurSel();
-		if (SelIndex < 0) SelIndex = 0;
-		INT_PTR PortNumber = this->PortsList.GetItemData(SelIndex);
-
 		CString COM;
-		COM.Format(_T("COM%d"), (int)PortNumber);
-		theApp.WriteProfileString(_T("Config"), _T("COMPort"), COM);
-
-		CString COMPath = _T("\\\\.\\") + COM;
-
-		tablet_status status = reset_tablet_ok;
+		tablet_status status = unknown;
 		if (this->UseStandardMouse.GetCheck()==0) {
-			status = setup_tablet(COMPath, microsoft_mouse_protocol);
+			status = DoActivate(COM);
 		}
+
 		if (status <= 0)
 		{
 			MessageBox(_T("SPTablet32 未能开启鼠标模拟功能!"), _T("SPTablet32"));
@@ -515,4 +529,19 @@ void CSPTablet32Dlg::OnDestroy()
 void CSPTablet32Dlg::OnBnClickedCheckUseStandardMouse()
 {
 	theApp.WriteProfileInt(_T("Config"), _T("UseStandardMouse"), this->UseStandardMouse.GetCheck());
+}
+
+
+void CSPTablet32Dlg::OnBnClickedButtonActivate()
+{
+	CString COM;
+	tablet_status status = this->DoActivate(COM);
+	if (status <= 0)
+	{
+		MessageBox(_T("SPTablet32 未能开启鼠标模拟功能!"), _T("SPTablet32"));
+	}
+	else {
+		MessageBox(_T("SPTablet32 已经开启鼠标模拟功能，请重启操作系统以使用!"), _T("SPTablet32"));
+
+	}
 }
