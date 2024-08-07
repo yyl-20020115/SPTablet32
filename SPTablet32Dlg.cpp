@@ -27,12 +27,12 @@ static void GetSerialPorts(std::vector<int>& ports, DWORD maxlen = 1ULL << 20)
 	if (szDevices != nullptr) {
 		memset(szDevices, 0, maxlen * sizeof(TCHAR));
 
-		DWORD dwChars = QueryDosDevice(NULL, szDevices, maxlen);
+		DWORD dwChars = QueryDosDevice(NULL, szDevices, maxlen - 1);
 		if (dwChars)
 		{
-			int i = 0;
+			DWORD i = 0;
 
-			for (; szDevices != nullptr;)
+			for (; szDevices != nullptr && i< dwChars;)
 			{
 				//Get the current device name
 				TCHAR* pszCurrentDevice = &szDevices[i];
@@ -264,7 +264,7 @@ void CSPTablet32Dlg::UpdateCommPortsList()
 }
 
 
-tablet_status CSPTablet32Dlg::DoActivate(CString& COM)
+tablet_status CSPTablet32Dlg::DoActivate(CString& COM) const
 {
 	tablet_status status = unknown;
 

@@ -33,7 +33,7 @@ protected:
 	void UpdateCommPortsList();
 
 
-	tablet_status DoActivate(CString& COM);
+	tablet_status DoActivate(CString& COM) const;
 // 实现
 protected:
 	HICON m_hIcon;
