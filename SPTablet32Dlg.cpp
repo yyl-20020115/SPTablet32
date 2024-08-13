@@ -10,14 +10,14 @@
 #include "SPTablet32API.h"
 #include <algorithm>
 
-#define WM_SHOW_TASK 0x400
-#define EXIT_MENU_ITEM_ID 0x300
-#define UM_NOTIFYICONDATA 0x200
-#define ID_REFRESH_TIMER 0x100
+constexpr auto WM_SHOW_TASK = 0x400;
+constexpr auto EXIT_MENU_ITEM_ID = 0x300;
+constexpr auto UM_NOTIFYICONDATA = 0x200;
+constexpr auto ID_REFRESH_TIMER = 0x100;
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
-static void GetSerialPorts(std::vector<int>& ports, DWORD maxlen = 1ULL << 20)
+static void GetSerialPorts(std::vector<DWORD_PTR>& ports, DWORD maxlen = 1ULL << 20)
 {
 	//Make sure we clear out any elements which may already be in the array
 	ports.clear();
@@ -43,7 +43,7 @@ static void GetSerialPorts(std::vector<int>& ports, DWORD maxlen = 1ULL << 20)
 				if (nLen > 3 && _tcsnicmp(pszCurrentDevice, _T("COM"), 3) == 0)
 				{
 					//Work out the port number
-					int nPort = _ttoi(&pszCurrentDevice[3]);
+					DWORD_PTR nPort = _ttoi(&pszCurrentDevice[3]);
 					ports.push_back(nPort);
 				}
 
@@ -62,7 +62,7 @@ static void GetSerialPorts(std::vector<int>& ports, DWORD maxlen = 1ULL << 20)
 		}
 		delete[] szDevices;
 	}
-	std::sort(ports.begin(), ports.end());
+	//std::sort(ports.begin(), ports.end());
 }
 
 
@@ -220,13 +220,14 @@ UINT CSPTablet32Dlg::onSendInput(int dx, int dy, bool left, bool right)
 
 void CSPTablet32Dlg::UpdateCommPortsList()
 {
-	std::vector<int> listed_ports;
-	std::vector<int> found_ports;
+	std::vector<DWORD_PTR> listed_ports;
+	std::vector<DWORD_PTR> found_ports;
 	GetSerialPorts(found_ports);
 	for (int i = 0; i < this->PortsList.GetCount(); i++) {
 		DWORD_PTR p = this->PortsList.GetItemData(i);
 		listed_ports.push_back((int)p);
 	}
+	std::sort(found_ports.begin(), found_ports.end());
 	std::sort(listed_ports.begin(), listed_ports.end());
 	bool eq = found_ports.size() > 0
 		&& listed_ports.size()
@@ -238,9 +239,10 @@ void CSPTablet32Dlg::UpdateCommPortsList()
 	if (!eq) {
 		this->PortsList.SetCurSel(-1);
 		this->PortsList.Clear();
+		this->PortsList.ResetContent();
 		for (size_t i = 0; i < found_ports.size(); i++) {
 			CString com_name;
-			int com_number = found_ports[i];
+			DWORD_PTR com_number = found_ports[i];
 			com_name.Format(_T("COM%d"), com_number);
 			int index = this->PortsList.AddString(com_name);
 			if (index >= 0) {
